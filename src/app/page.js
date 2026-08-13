@@ -118,16 +118,59 @@ export default function Game() {
     { name: '🐱 貓咪20號', power: 100, isPlayer: false },
   ]);
   // 修正：將寫死的貓咪名單與你（玩家）的真實戰力即時大排序，並精準計算個人全服排名
-          // 🟢 完美回溯：將你、其他3位真人(allPlayers)與假貓咪同台的最初正統排序
+  // 🟢 完美修正：保留全服真人玩家，僅對名冊內的假貓咪進行第一名戰力動態加權！
   const displayLeaderboard = (() => {
-    let list = [...allPlayers];
-    // 檢查是否已經把自己塞進去了，如果沒有則補上
-    if (!list.some(p => p.isPlayer)) {
+    // 🧙‍♂️ 第一步：找出目前純玩家維度裡的最強戰力（當作貓咪的加權火車頭）
+    const topPlayerPower = Math.max(stats.power, 500);
+
+    // 🧙‍♂️ 第二步：讀取包含 3 位真人的 allPlayers 狀態，並用 map 迴圈只對假貓咪進行動態公式加權！
+    let list = allPlayers.map(p => {
+      // 如果這個人是真人玩家，原封不動保留他的真實名字與戰力，絕不洗掉！
+      if (p.isPlayer || !p.name.startsWith('🐱')) {
+        return p;
+      }
+
+      // 如果這個人是假貓咪，根據名次進行你想要的第一名戰力階梯式動態加權！
+      const catName = p.name;
+      const catNum = parseInt(catName.replace('🐱 貓咪', '').replace('號', '')) || 1;
+      let finalCatPower = 0;
+
+      if (catNum === 1) {
+        finalCatPower = Math.floor(480 * (topPlayerPower * 0.002) + 200); 
+      } else if (catNum === 2) {
+        finalCatPower = Math.floor(460 * (topPlayerPower * 0.0015) + 100);
+      } else if (catNum === 3) {
+        finalCatPower = Math.floor(440 * (topPlayerPower * 0.0012) + 80);
+      } else if (catNum === 4) {
+        finalCatPower = Math.floor(420 * (topPlayerPower * 0.001) + 50);
+      } else if (catNum === 5) {
+        finalCatPower = Math.floor(400 * (topPlayerPower * 0.0005) + 20);
+      } else {
+        const elapsedSeconds = 86400 - (timeToReset || 86400);
+        const liveVolatility = Math.floor(Math.sin(Math.floor(elapsedSeconds / 3) + catNum) * 15);
+        finalCatPower = Math.floor((500 - catNum * 22) * (1 + chestLevel * 0.05)) + liveVolatility;
+      }
+
+      return {
+        ...p,
+        power: finalCatPower > 10 ? finalCatPower : 10
+      };
+    });
+
+    // 第三步：檢查是否已經把自己塞進去了，如果沒有則補上（或即時同步自己的最新戰力）
+    const playerIndex = list.findIndex(p => p.isPlayer);
+    if (playerIndex !== -1) {
+      list[playerIndex].power = stats.power;
+      list[playerIndex].name = authInput.username || '你（玩家）';
+    } else {
       list.push({ name: authInput.username || '你（玩家）', power: stats.power, isPlayer: true });
     }
+
+    // 第四步：全服混合大排序！
     list.sort((a, b) => b.power - a.power);
     return list;
   })();
+
 
   const filteredLeaderboard = displayLeaderboard.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
