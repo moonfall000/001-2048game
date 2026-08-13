@@ -589,18 +589,34 @@ export default function Game() {
     setGold(p => p - cost); setChestLevel(nl);
   };
 
-  const equipItem = () => { if (!newDrop) return; setEquipped(prev => ({ ...prev, [newDrop.slot]: newDrop })); setNewDrop(null); };
-    // 🧙‍♂️ 核心修正：分解舊的/新的裝備後，100% 自動重啟掛機，讓永動箱子繼續瘋狂推進！
+  // 🧙‍♂️ 核心修正：換上裝備！將新裝穿上，並強行把脫下來的「舊裝備」完美吐回掉落欄，絕不憑空消失！
+  const equipItem = () => {
+    if (!newDrop) return;
+    const currentEquippedItem = equipped[newDrop.slot]; // 先把身上的舊裝備藏起來
+    
+    setEquipped(p => ({ ...p, [newDrop.slot]: newDrop })); // 把新裝備穿上身
+    
+    if (currentEquippedItem) {
+      // 💡 靈魂改動：如果原本有穿衣服，把脫下來的舊衣服原地「吐回掉落對比欄」，讓玩家可以手動分解它！
+      setNewDrop(currentEquippedItem); 
+    } else {
+      // 如果原本是裸體，沒衣服可脫，掉落欄才清空
+      setNewDrop(null);
+    }
+  };
+
+  // 🧙‍♂️ 核心修正：分解函式！不論分解的是新抽到的垃圾，還是剛剛換下來的舊裝，分解完一律全自動「繼續開箱」！
   const sellItem = () => {
     if (!newDrop) return;
     setGold(g => g + newDrop.sellValue);
-    setNewDrop(null);
+    setNewDrop(null); // 清空掉落欄
     
-    // 💡 靈魂新增：只要庫存還有箱子，分解完的瞬間，全自動無感重新亮起「自動開箱」！
+    // 💡 永動關鍵：只要背包庫存還有寶箱，分解完成清空的瞬間，全自動無感重新亮起「自動開箱」！
     if (chestCount > 0) {
       setIsAutoOpen(true);
     }
   };
+
   const reset2048 = () => { let eb = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]; eb = addRandomTile(eb); eb = addRandomTile(eb); setBoard(eb); setScore(0); };
 
   const currentEquippedItem = newDrop ? equipped[newDrop.slot] : null;
