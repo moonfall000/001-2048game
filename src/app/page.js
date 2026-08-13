@@ -128,7 +128,7 @@ export default function Game() {
       
       // 🎯 規律衰減核心：計算這隻貓咪的「咬合係數」
       // 貓咪 1 號係數最大 (0.00200)，名次越後面，除以 catNum 的增長，讓加權幅度以規律的斜率瘋狂縮小！
-      const weightFactor = 0.002 / Math.pow(catNum, 0.65); // 0.65次方控制衰減平滑度，名次越後越咬不動
+      const weightFactor = (500 - catNum * 8) * 0.002 / Math.pow(catNum, 0.85); // 0.65次方控制衰減平滑度，名次越後越咬不動
       
       // 🎮 基礎保底戰力也隨著排名由大到小規律遞減
       const basePower = Math.max(10, 500 - catNum * 8) * (1 + chestLevel * 0.05);
@@ -138,7 +138,7 @@ export default function Game() {
 
       // 🎲 偽隨機跳動：一樣引入全域同步時間秒數 (timeToReset)，讓 100 隻貓咪有在線上呼吸的換裝跳動感
       const elapsedSeconds = 86400 - (timeToReset || 86400);
-      const liveVolatility = Math.floor(Math.sin(Math.floor(elapsedSeconds / 3) + catNum) * 15);
+      const liveVolatility = Math.floor(Math.sin(Math.floor(elapsedSeconds / 3) + catNum) * 125);
       finalCatPower += liveVolatility;
 
       return {
