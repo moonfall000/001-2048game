@@ -349,25 +349,29 @@ export default function Game() {
     return () => clearInterval(rankTimer);
   }, [stats.power, user, timeToReset, authInput.username]);
 
-  // 倒數發寶箱計時器
+    // 🎁 核心修正：發獎勵計時器！使用實時參照（Ref）突破 React 閉包鎖死，100% 抓取歸零那一秒的最新名次
+  const rankRef = useRef(currentMyRank);
+  useEffect(() => { rankRef.current = currentMyRank; }, [currentMyRank]);
+
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeToReset(prev => {
         if (prev <= 1) {
-        // 🧙‍♂️ 新增：根據你當前的「真實全服名次 (currentMyRank)」發放不同數量的寶箱與金幣！
-          let rewardChests = 50; // 預設保底獎勵
+          // 🧙‍♂️ 終極正名：從 rankRef 中一槍命中倒數歸零那一瞬間，你真正的實時最新排名！
+          const realLatestRank = rankRef.current;
+
+          let rewardChests = 50; 
           let rewardGold = 1000;
 
-          if (currentMyRank === 1) { rewardChests = 1000; rewardGold = 500000; } // 第 1 名拿 1000 箱 + 50 萬金幣！
-          else if (currentMyRank === 2) { rewardChests = 500; rewardGold = 200000; } // 第 2 名拿 500 箱 + 20 萬金幣
-          else if (currentMyRank === 3) { rewardChests = 300; rewardGold = 100000; } // 第 3 名拿 300 箱 + 10 萬金幣
-          else if (currentMyRank <= 10) { rewardChests = 150; rewardGold = 30000; } // 前 10 名拿 150 箱
+          if (realLatestRank === 1) { rewardChests = 1000; rewardGold = 500000; } 
+          else if (realLatestRank === 2) { rewardChests = 500; rewardGold = 200000; } 
+          else if (realLatestRank === 3) { rewardChests = 300; rewardGold = 100000; } 
+          else if (realLatestRank <= 10) { rewardChests = 150; rewardGold = 30000; } 
 
           setChestCount(c => c + rewardChests);
           setGold(g => g + rewardGold);
-          alert(`🏆 排行榜每日結算！\n\n恭喜你獲得全服第 ${currentMyRank} 名！\n🎁 獲得獎勵：寶箱 +${rewardChests} 個、金幣 +${rewardGold.toLocaleString()}🪙！`);
-
-          alert(`🏆 排行榜每分鐘結算！寶箱已自動發放！`);
+          
+          alert(`🏆 排行榜每日結算！\n\n恭喜你獲得全服第 ${realLatestRank} 名！\n🎁 獲得獎勵：寶箱 +${rewardChests} 個、金幣 +${rewardGold.toLocaleString()}🪙！`);
           return 60; 
         }
         return prev - 1;
@@ -375,6 +379,7 @@ export default function Game() {
     }, 1000);
     return () => clearInterval(timer);
   }, []);
+
   // 核心修復：100% 精準的 2048 上下左右滑動合併演算法
     // 核心終極修復：全實心二維陣列、保證 100% 正向垂直向下合併、絕不留空的 2048 演算法
   const move = useCallback((direction) => {
