@@ -171,9 +171,6 @@ export default function Game() {
     return list;
   })();
 
-
-  const filteredLeaderboard = displayLeaderboard.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()));
-
   // 即時計算我的真實排名
   const currentMyRank = displayLeaderboard.findIndex(p => p.isPlayer) + 1;
 
