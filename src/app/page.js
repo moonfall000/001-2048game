@@ -828,12 +828,12 @@ export default function Game() {
       //貓咪算法
       // 🎯 規律衰減核心：計算這隻貓咪的「咬合係數」
       // 除以 catNum 的增長，讓加權幅度以規律的斜率瘋狂縮小！ 基本上50名後吃不到加權
-      let Numofcat = (575 - catNum * 12);
+      let Numofcat = (575 - catNum * 10);
       if (Numofcat <= 0) { Numofcat = 1};
-      const weightFactor = (Numofcat) * 0.0012 / Math.pow(catNum, 0.995); // 0.65次方控制衰減平滑度，名次越後越咬不動
+      const weightFactor = (Numofcat) * 0.0014 / Math.pow(catNum, 0.995); // 0.65次方控制衰減平滑度，名次越後越咬不動
       
       // 🎮 基礎保底戰力也隨著排名由大到小規律遞減
-      const basePower = Math.max(10, 5000 - catNum * 48) * (1 + chestLevel * 0.05);
+      const basePower = Math.max(10, 5000 - catNum * 22) * (1 + chestLevel * 0.05);
       
       // ⚔️ 最終計算：真・第一名戰力 * 專屬衰減係數 + 保底基底
       let finalCatPower = Math.floor(((realTopOnePower * weightFactor)/catNum)/catNum) + Math.floor(basePower);
