@@ -349,36 +349,52 @@ export default function Game() {
     return () => clearInterval(rankTimer);
   }, [stats.power, user, timeToReset, authInput.username]);
 
-    // 🎁 核心修正：發獎勵計時器！使用實時參照（Ref）突破 React 閉包鎖死，100% 抓取歸零那一秒的最新名次
+     // 🌐 終極魔改：全服集體同步結算引擎！死死鎖定每天半夜 24:00（晚上12點）集體同步發獎
   const rankRef = useRef(currentMyRank);
   useEffect(() => { rankRef.current = currentMyRank; }, [currentMyRank]);
 
+  // 新增一個旗標，防止時間到那一秒因為 setInterval 跑太快導致重疊彈出兩次 alert
+  const hasRewardedToday = useRef(false);
+
   useEffect(() => {
     const timer = setInterval(() => {
-      setTimeToReset(prev => {
-        if (prev <= 1) {
-          // 🧙‍♂️ 終極正名：從 rankRef 中一槍命中倒數歸零那一瞬間，你真正的實時最新排名！
-          const realLatestRank = rankRef.current;
+      const now = new Date();
+      
+      // 1. 計算距離今天晚上 24:00 (明天凌晨 00:00:00) 還剩下多少秒
+      const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0);
+      const secondsLeft = Math.floor((tomorrow.getTime() - now.getTime()) / 1000);
 
+      // 2. 將全服統一的剩餘秒數同步到畫面上的倒數看板
+      setTimeToReset(secondsLeft);
+
+      // 3. 核心大判定：當秒數歸零、或是剛好跨越到新的一天的第一秒時（secondsLeft 剛好是當天最大秒數 86400 附近）
+      if (secondsLeft <= 0 || secondsLeft >= 86399) {
+        if (!hasRewardedToday.current) {
+          hasRewardedToday.current = true; // 鎖定，今天領過獎了
+          
+          const realLatestRank = rankRef.current;
           let rewardChests = 50; 
           let rewardGold = 1000;
 
-          if (realLatestRank === 1) { rewardChests = 100000; rewardGold = 5000000; } 
-          else if (realLatestRank === 2) { rewardChests = 50000; rewardGold = 2000000; } 
-          else if (realLatestRank === 3) { rewardChests = 3000; rewardGold = 100000; } 
-          else if (realLatestRank <= 10) { rewardChests = 1500; rewardGold = 30000; } 
+          if (realLatestRank === 1) { rewardChests = 1000; rewardGold = 500000; } 
+          else if (realLatestRank === 2) { rewardChests = 500; rewardGold = 200000; } 
+          else if (realLatestRank === 3) { rewardChests = 300; rewardGold = 100000; } 
+          else if (realLatestRank <= 10) { rewardChests = 150; rewardGold = 30000; } 
 
           setChestCount(c => c + rewardChests);
           setGold(g => g + rewardGold);
           
-          alert(`🏆 排行榜每日結算！\n\n恭喜你獲得全服第 ${realLatestRank} 名！\n🎁 獲得獎勵：寶箱 +${rewardChests} 個、金幣 +${rewardGold.toLocaleString()}🪙！`);
-          return 60; 
+          alert(`🏆 《2048貓咪開箱傳說》 全服每日零點大結算！\n\n恭喜你今日榮獲全服第 ${realLatestRank} 名！\n🎁 獎勵已同步派發：寶箱 +${rewardChests} 個、金幣 +${rewardGold.toLocaleString()}🪙！\n\n新一輪賽事已重置啟動，祝新賽季武運昌隆！`);
         }
-        return prev - 1;
-      });
+      } else {
+        // 只要不是在跨天那一秒，就把旗標解開，準備迎接明天的半夜 12 點
+        hasRewardedToday.current = false;
+      }
     }, 1000);
+
     return () => clearInterval(timer);
   }, []);
+
 
   // 核心修復：100% 精準的 2048 上下左右滑動合併演算法
     // 核心終極修復：全實心二維陣列、保證 100% 正向垂直向下合併、絕不留空的 2048 演算法
@@ -707,8 +723,14 @@ export default function Game() {
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', color: '#fb5555', fontWeight: 'bold', marginBottom: '6px', padding: '0 4px' }}>
-              <span>🏆 全服實時名冊 (可滑動下拉)</span>
-              <span>刷新: {timeToReset}s</span>
+              <span>🏆 全服實時排行 (可滑動下拉)</span>
+                <span>結算倒數: {(() => {
+                const h = Math.floor(timeToReset / 3600).toString().padStart(2, '0');
+                const m = Math.floor((timeToReset % 3600) / 60).toString().padStart(2, '0');
+                const s = (timeToReset % 60).toString().padStart(2, '0');
+                return `${h}:${m}:${s}`;
+              })()}</span>
+
             </div>
 
             {/* 📜 帶有垂直滾動滑桿（Overflow-Y）的真實前10名/全服名冊顯示區 */}
