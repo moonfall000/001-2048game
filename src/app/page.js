@@ -891,19 +891,35 @@ export default function Game() {
                     <div>生命: {newDrop.health} <span style={{ color: '#4ade80' }}>({currentEquippedItem ? `+${newDrop.health - currentEquippedItem.health}` : `+${newDrop.health}`})</span></div>
                   </div>
                     {/* 🧙‍♂️ 核心新增：舊裝備面板！將換下來的裝備同步顯示，並用綠色/紅色即時看出戰力加減 */}
+                              <div>
+              <h3 style={{ margin: '0 0 6px 0', fontSize: '12px', color: '#f59e0b' }}>✨ 新舊裝備屬性對比 (綠加紅減)</h3>
+              {newDrop ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  {/* 🟢 掉落欄主位：顯示剛抽到 (或剛換下來) 的新目標 */}
+                  <div style={{ padding: '8px', borderRadius: '8px', border: `1px solid ${RARITY_SETTINGS[newDrop.rarity].color}`, backgroundColor: RARITY_SETTINGS[newDrop.rarity].bg, fontSize: '12px' }}>
+                    <div style={{ opacity: 0.6, fontSize: '10px' }}>{newDrop.slot} - 掉落物/待處置</div>
+                    <div style={{ fontWeight: 'bold', color: RARITY_SETTINGS[newDrop.rarity].color }}>{newDrop.name}</div>
+                  </div>
+                  
+                  <div style={{ backgroundColor: '#020617', padding: '10px', borderRadius: '8px', fontSize: '12px', fontFamily: 'monospace', lineHeight: '1.5' }}>
+                    <div>攻擊: {newDrop.attack} {currentEquippedItem ? ( <span style={{ color: newDrop.attack - currentEquippedItem.attack >= 0 ? '#4ade80' : '#f87171' }}>({newDrop.attack - currentEquippedItem.attack >= 0 ? `+${newDrop.attack - currentEquippedItem.attack}` : `${newDrop.attack - currentEquippedItem.attack}`})</span> ) : <span style={{ color: '#4ade80' }}>({`+${newDrop.attack}`})</span>}</div>
+                    <div>防禦: {newDrop.defense} {currentEquippedItem ? ( <span style={{ color: newDrop.defense - currentEquippedItem.defense >= 0 ? '#4ade80' : '#f87171' }}>({newDrop.defense - currentEquippedItem.defense >= 0 ? `+${newDrop.defense - currentEquippedItem.defense}` : `${newDrop.defense - currentEquippedItem.defense}`})</span> ) : <span style={{ color: '#4ade80' }}>({`+${newDrop.defense}`})</span>}</div>
+                    <div>生命: {newDrop.health} {currentEquippedItem ? ( <span style={{ color: newDrop.health - currentEquippedItem.health >= 0 ? '#4ade80' : '#f87171' }}>({newDrop.health - currentEquippedItem.health >= 0 ? `+${newDrop.health - currentEquippedItem.health}` : `${newDrop.health - currentEquippedItem.health}`})</span> ) : <span style={{ color: '#4ade80' }}>({`+${newDrop.health}`})</span>}</div>
+                  </div>
+
+                  {/* 🧙‍♂️ 舊裝備對比欄：當身上有穿衣服時，在下方顯示即將被對調下來的舊裝備數值 */}
                   {currentEquippedItem && (
-                    <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px dashed #334155' }}>
-                      <div style={{ padding: '6px', borderRadius: '6px', backgroundColor: '#020617', border: '1px solid #1e293b', fontSize: '11px', marginBottom: '6px' }}>
-                        <span style={{ color: '#64748b' }}>當前穿戴：</span>
+                    <div style={{ marginTop: '4px', paddingTop: '8px', borderTop: '1px dashed #334155' }}>
+                      <div style={{ padding: '6px', borderRadius: '6px', backgroundColor: '#020617', border: '1px solid #1e293b', fontSize: '11px', marginBottom: '4px' }}>
+                        <span style={{ color: '#64748b' }}>🧍 身上穿戴：</span>
                         <span style={{ color: RARITY_SETTINGS[currentEquippedItem.rarity].color, fontWeight: 'bold' }}>{currentEquippedItem.name}</span>
-                      </div>
-                      <div style={{ backgroundColor: '#020617', padding: '10px', borderRadius: '8px', fontSize: '12px', fontFamily: 'monospace', lineHeight: '1.5' }}>
-                        <div>舊攻擊: {currentEquippedItem.attack} <span style={{ color: newDrop.attack - currentEquippedItem.attack >= 0 ? '#4ade80' : '#f87171' }}>({newDrop.attack - currentEquippedItem.attack >= 0 ? `-${newDrop.attack - currentEquippedItem.attack}` : `+${currentEquippedItem.attack - newDrop.attack}`})</span></div>
-                        <div>舊防禦: {currentEquippedItem.defense} <span style={{ color: newDrop.defense - currentEquippedItem.defense >= 0 ? '#4ade80' : '#f87171' }}>({newDrop.defense - currentEquippedItem.defense >= 0 ? `-${newDrop.defense - currentEquippedItem.defense}` : `+${currentEquippedItem.defense - newDrop.defense}`})</span></div>
-                        <div>舊生命: {currentEquippedItem.health} <span style={{ color: newDrop.health - currentEquippedItem.health >= 0 ? '#4ade80' : '#f87171' }}>({newDrop.health - currentEquippedItem.health >= 0 ? `-${newDrop.health - currentEquippedItem.health}` : `+${currentEquippedItem.health - newDrop.health}`})</span></div>
                       </div>
                     </div>
                   )}
+                </div>
+              ) : <p style={{ color: '#475569', fontSize: '12px', textAlign: 'center', padding: '30px 0', margin: 0, fontStyle: 'italic' }}>等待開啟寶箱...</p>}
+            </div>
+
                 </div>
               ) : (
                 <p style={{ color: '#475569', fontSize: '12px', textAlign: 'center', padding: '30px 0', margin: 0, fontStyle: 'italic' }}>等待神木開啟寶箱...</p>
