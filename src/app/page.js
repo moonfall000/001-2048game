@@ -499,11 +499,12 @@ export default function Game() {
       setGold(g => g + (finalEarned > 0 ? finalEarned : earnedGold));
       // 📦 核心新增：2048 驚喜掉箱機制！只要「本次合併產生的最高方塊數值」大於等於 128，直接階梯式暴擊贈送寶箱！
       if (earnedGold >= 128) {
+        let bonusChests = 10;
         if (earnedGold >= 2048) { bonusChests = 1000 * chestLevel; }      // 合出 2048 送
         else if (earnedGold >= 1024) { bonusChests = 500 * chestLevel; }  // 合出 1024 送
         else if (earnedGold >= 512) { bonusChests = 200 * chestLevel; }    // 合出 512 送 
         else if (earnedGold >= 256) { bonusChests = 50 * chestLevel; }     // 合出 256 送 
-        
+        else if (earnedGold >= 128) { bonusChests = 10 * chestLevel; }     // 合出 256 送 
         setChestCount(c => c + bonusChests);
       }
     }
