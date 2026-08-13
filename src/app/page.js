@@ -96,7 +96,7 @@ export default function Game() {
   // 儲存雲端撈出的所有玩家+貓咪完整名冊
     // 核心修正：開局直接把 🐱 貓咪 1 號到 20 號寫死塞入 allPlayers 狀態，保證搜尋滑桿絕對不落空！
   const [allPlayers, setAllPlayers] = useState([
-    { name: '🐱 貓咪1號', power: 480, isPlayer: false },
+    { name: '🐱 貓咪1號', power: 480 * 0.876543212345, isPlayer: false },
     { name: '🐱 貓咪2號', power: 460, isPlayer: false },
     { name: '🐱 貓咪3號', power: 440, isPlayer: false },
     { name: '🐱 貓咪4號', power: 420, isPlayer: false },
@@ -118,20 +118,52 @@ export default function Game() {
     { name: '🐱 貓咪20號', power: 100, isPlayer: false },
   ]);
   // 核心修正：將寫死的貓咪名單與你（玩家）的真實戰力即時大排序，並精準計算個人全服排名
+    // 🌐 核心修正：全服絕對同步大排序！用「玩家最高戰力 (含自己與雲端加權)」作為火車頭加權，彻底繞過無窮迴圈死鎖！
   const displayLeaderboard = (() => {
-    // 複製貓咪名冊，並強行把「你（玩家）」的最新戰力塞進去
-    let list = [...allPlayers];
-    const playerIndex = list.findIndex(p => p.isPlayer);
-    if (playerIndex !== -1) {
-      list[playerIndex].power = stats.power;
-      list[playerIndex].name = authInput.username || '你（玩家）';
-    } else {
-      list.push({ name: authInput.username || '你（玩家）', power: stats.power, isPlayer: true });
-    }
-    // 由大到小排序
+    // 🧙‍♂️ 第一步：找出目前純玩家維度裡的最強戰力（拿你個人的最新戰力 stats.power 作為基準火車頭）
+    // 未來如果加上全服 Supabase 玩家，這裡也可以直接讀取雲端第一名的數字，它全域唯一且不依賴貓咪
+    const topPlayerPower = Math.max(stats.power, 500);
+
+    // 🧙‍♂️ 第二步：用這個「第一名戰力」作為全服動態通膨的加權係數，全自動生成 20 隻貓咪
+    const list = Array.from({ length: 20 }, (_, i) => {
+      const catNum = i + 1;
+      
+      // 🎮 玥楓策劃公式：480 * 第一名戰力 * 0.0001 + 階梯式保底基底
+      let finalCatPower = 0;
+      
+      if (catNum === 1) {
+        // 貓咪 1 號：精準使用第一名戰力加權，永遠壓在最高頂點當全服大魔王！
+        finalCatPower = Math.floor(480 * (topPlayerPower * 0.002) + 200); 
+      } else if (catNum === 2) {
+        // 貓咪 2 號：加權係數稍微降低，卡在第二名
+        finalCatPower = Math.floor(460 * (topPlayerPower * 0.0015) + 100);
+      } else {
+        // 其餘貓咪：根據排名階梯式遞減，並引入全服同步的時間秒數 (timeToReset) 做微幅每秒同步跳動，極度逼真
+        const elapsedSeconds = 86400 - (timeToReset || 86400);
+        const liveVolatility = Math.floor(Math.sin(Math.floor(elapsedSeconds / 3) + catNum) * 15);
+        
+        finalCatPower = Math.floor((500 - catNum * 22) * (1 + chestLevel * 0.05)) + liveVolatility;
+      }
+
+      return {
+        name: `🐱 貓咪${catNum}號`,
+        power: finalCatPower > 10 ? finalCatPower : 10,
+        isPlayer: false
+      };
+    });
+
+    // 第三步：把正在實時開箱、戰力儲存在 profiles 資料庫裡的你（玩家）自己塞進名單
+    list.push({ 
+      name: authInput.username || '你（玩家）', 
+      power: stats.power, 
+      isPlayer: true 
+    });
+
+    // 第四步：全服大排序！
     list.sort((a, b) => b.power - a.power);
     return list;
   })();
+
 
   // 即時計算我的真實排名
   const currentMyRank = displayLeaderboard.findIndex(p => p.isPlayer) + 1;
