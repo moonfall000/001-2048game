@@ -1,0 +1,18 @@
+import './globals.css';
+
+export const metadata = {
+  title: '2048貓咪開箱傳說',
+  description: '結合開箱掛機與2048的網頁遊戲',
+};
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="zh-TW">
+      <body>{children}</body>
+    </html>
+  );
+}
+//git add .
+//git commit -m "fix: anti-wipe cloud save engine"
+//git push
+
