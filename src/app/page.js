@@ -141,30 +141,26 @@ export default function Game() {
           // 2. 跨時空精準定位：找出目前全伺服器所有「真人玩家」裡的最強天花板戰力
           const maxRealPlayerPower = cloudUsers.length > 0 ? Math.max(...cloudUsers.map(u => u.power || 500)) : 500;
 
-          // 3. 建立真人玩家清單
+                    // 3. 建立真人玩家清單（核心修正：改用登入成功的 user.id 來當作唯一的鋼鐵身分標籤，絕對不吃錯變數！）
           const realPlayersList = cloudUsers.map(u => ({
             name: u.username || '無名勇者',
             power: u.power || 0,
-            isPlayer: u.username === authInput.username // 點亮你自己
+            isPlayer: u.username === (user?.user_metadata?.username || authInput.username) || u.id === user?.id
           }));
 
-          // 4. 原地動態生成 20 隻假貓咪，精準使用剛抓到的「真人第一名戰力」進行動態通膨加權！
-          const catsList = Array.from({ length: 20 }, (_, i) => {
+          // 4. 原地動態生成 20 隻假貓咪，使用真人最高戰力進行加權通膨
+          const catsList = Array.from({ length: 100 }, (_, i) => {
             const catNum = i + 1;
-            
             let catPower = 0;
             if (catNum === 1) {
-              // 🐱 貓咪 1 號：精準使用全服玩家最強戰力加權，永遠卡在最頂端當全服終極大魔王！
               catPower = Math.floor(480 * (maxRealPlayerPower * 0.002) + 200);
             } else if (catNum === 2) {
               catPower = Math.floor(460 * (maxRealPlayerPower * 0.0015) + 100);
             } else {
-              // 其餘貓咪：階梯式遞減，並引入全域同步的時間秒數 (timeToReset) 模擬動態跳動
               const elapsedSeconds = 86400 - (timeToReset || 86400);
               const liveVolatility = Math.floor(Math.sin(Math.floor(elapsedSeconds / 3) + catNum) * 15);
               catPower = Math.floor((500 - catNum * 22) * (1 + chestLevel * 0.05)) + liveVolatility;
             }
-
             return {
               name: `🐱 貓咪${catNum}號`,
               power: catPower > 10 ? catPower : 10,
@@ -172,12 +168,13 @@ export default function Game() {
             };
           });
 
-          // 5. 終極合體大混戰！把真人玩家與動態加權貓咪全部塞進同一個陣列，並進行全服總排序！
+          // 5. 終極合體：把「所有 3 位真人玩家」與「20 隻動態貓咪」通通塞進去，由大到小進行全服大排序！
           const finalMixedLeaderboard = [...realPlayersList, ...catsList];
           finalMixedLeaderboard.sort((a, b) => b.power - a.power);
 
-          // 6. 更新到畫面上
+          // 6. 滿血更新到畫面上
           setGlobalPlayers(finalMixedLeaderboard);
+
         }
       } catch (e) { console.error("全服綜合榜單同步失敗:", e); }
     };
