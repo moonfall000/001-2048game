@@ -181,11 +181,7 @@ export default function Game() {
         }
       } catch (e) { console.error("全服綜合榜單同步失敗:", e); }
     };
-
     fetchGlobalData();
-    // 每 5 秒鐘全自動在背景無感更新一次，讓你一換裝、或是別的玩家一上線，所有人榜單同步跳動！
-    const syncTimer = setInterval(fetchGlobalData, 5000);
-    return () => clearInterval(syncTimer);
   }, [user, stats.power, timeToReset]); // 👈 只要你戰力變強或時間跳動，立刻即時重新加權排序！
 
   // 即時計算我的真實排名
