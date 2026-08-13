@@ -1,0 +1,3 @@
+//清除舊的終端背景執行 可以還原至http://localhost:3000
+Stop-Process -Name "node" -Force -ErrorAction SilentlyContinue
+npm run dev

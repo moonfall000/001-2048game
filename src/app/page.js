@@ -184,12 +184,15 @@ export default function Game() {
           // 4. 從資料庫撈取該玩家儲存的所有金幣、裝備、2048 棋盤進度
           const { data: profData, error: fetchErr } = await supabase.from('profiles').select('*').eq('id', loginData.user.id).single();
           if (!fetchErr && profData) {
-            setGold(profData.gold); setChestCount(profData.chest_count); setChestLevel(profData.chest_level);
-            setScore(profData.score); if (profData.board) setBoard(profData.board);
+            setGold(profData.gold);
+            setChestCount(profData.chest_count);
+            setChestLevel(profData.chest_level);
+            setScore(profData.score);
+            if (profData.board) setBoard(profData.board);
             if (profData.equipped) setEquipped(profData.equipped);
-          }
           // 🧙‍♂️ 核正：確認雲端舊檔已經百分之百完美寫入 React 狀態，此時才可以安全開啟上傳
           setIsCloudDataLoaded(true);
+          }
           setUser(loginData.user);
           alert("🔑 歡迎回來，小貓咪！雲端存檔已同步載入。");
         }
