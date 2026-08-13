@@ -363,10 +363,10 @@ export default function Game() {
           let rewardChests = 50; 
           let rewardGold = 1000;
 
-          if (realLatestRank === 1) { rewardChests = 1000; rewardGold = 500000; } 
-          else if (realLatestRank === 2) { rewardChests = 500; rewardGold = 200000; } 
-          else if (realLatestRank === 3) { rewardChests = 300; rewardGold = 100000; } 
-          else if (realLatestRank <= 10) { rewardChests = 150; rewardGold = 30000; } 
+          if (realLatestRank === 1) { rewardChests = 100000; rewardGold = 5000000; } 
+          else if (realLatestRank === 2) { rewardChests = 50000; rewardGold = 2000000; } 
+          else if (realLatestRank === 3) { rewardChests = 3000; rewardGold = 100000; } 
+          else if (realLatestRank <= 10) { rewardChests = 1500; rewardGold = 30000; } 
 
           setChestCount(c => c + rewardChests);
           setGold(g => g + rewardGold);
