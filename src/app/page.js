@@ -122,11 +122,11 @@ export default function Game() {
   const displayLeaderboard = globalPlayers || [];
   const filteredLeaderboard = displayLeaderboard.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()));
     // 🌐 終極大團圓引擎：從 Supabase 撈取全服所有真人玩家，並在原地塞入「第一名戰力加權」的 20 隻同步貓咪！
+  // 🌐 終極大團圓引擎：從 Supabase 撈取全服所有真人玩家，並在原地塞入「第一名戰力加權」的 20 隻同步貓咪！
   const [globalPlayers, setGlobalPlayers] = useState([]);
 
   useEffect(() => {
-    if (!user) return;
-
+    // 🧙‍♂️ 核心修正：如果 user 還沒登入成功，先拿你本地的初始狀態保底顯示，絕對不讓畫面變空白！
     const fetchGlobalData = async () => {
       try {
         const { supabase } = await import('../lib/supabase');
@@ -134,52 +134,63 @@ export default function Game() {
         // 1. 從雲端資料庫 profiles 撈出所有真人在線玩家的暱稱與真實戰力
         const { data: cloudUsers, error } = await supabase
           .from('profiles')
-          .select('username, power')
+          .select('id, username, power')
           .order('power', { ascending: false });
 
-        if (!error && cloudUsers) {
-          // 2. 跨時空精準定位：找出目前全伺服器所有「真人玩家」裡的最強天花板戰力
-          const maxRealPlayerPower = cloudUsers.length > 0 ? Math.max(...cloudUsers.map(u => u.power || 500)) : 500;
+        // 建立一個基礎名冊裝載器
+        let realPlayersList = [];
 
-                    // 3. 建立真人玩家清單（核心修正：改用登入成功的 user.id 來當作唯一的鋼鐵身分標籤，絕對不吃錯變數！）
-          const realPlayersList = cloudUsers.map(u => ({
+        if (!error && cloudUsers && cloudUsers.length > 0) {
+          // 2. 如果雲端有撈到其他人，老老實實把這 3 位真人勇者通通裝進來
+          realPlayersList = cloudUsers.map(u => ({
             name: u.username || '無名勇者',
             power: u.power || 0,
-            isPlayer: u.username === (user?.user_metadata?.username || authInput.username) || u.id === user?.id
+            isPlayer: u.id === user?.id || u.username === authInput.username
           }));
-
-          // 4. 原地動態生成 20 隻假貓咪，使用真人最高戰力進行加權通膨
-          const catsList = Array.from({ length: 100 }, (_, i) => {
-            const catNum = i + 1;
-            let catPower = 0;
-            if (catNum === 1) {
-              catPower = Math.floor(480 * (maxRealPlayerPower * 0.002) + 200);
-            } else if (catNum === 2) {
-              catPower = Math.floor(460 * (maxRealPlayerPower * 0.0015) + 100);
-            } else {
-              const elapsedSeconds = 86400 - (timeToReset || 86400);
-              const liveVolatility = Math.floor(Math.sin(Math.floor(elapsedSeconds / 3) + catNum) * 15);
-              catPower = Math.floor((500 - catNum * 22) * (1 + chestLevel * 0.05)) + liveVolatility;
-            }
-            return {
-              name: `🐱 貓咪${catNum}號`,
-              power: catPower > 10 ? catPower : 10,
-              isPlayer: false
-            };
-          });
-
-          // 5. 終極合體：把「所有 3 位真人玩家」與「20 隻動態貓咪」通通塞進去，由大到小進行全服大排序！
-          const finalMixedLeaderboard = [...realPlayersList, ...catsList];
-          finalMixedLeaderboard.sort((a, b) => b.power - a.power);
-
-          // 6. 滿血更新到畫面上
-          setGlobalPlayers(finalMixedLeaderboard);
-
+        } else {
+          // 如果雲端暫時沒人，至少把玩家自己先塞進保底名單
+          realPlayersList = [{
+            name: authInput.username || '你（玩家）',
+            power: stats.power,
+            isPlayer: true
+          }];
         }
+
+        // 3. 找出目前全伺服器所有「真人玩家」裡的最強天花板戰力（當作貓咪的加權火車頭）
+        const maxRealPlayerPower = realPlayersList.length > 0 ? Math.max(...realPlayersList.map(u => u.power || 500)) : 500;
+
+        // 4. 原地動態生成 20 隻假貓咪，精準使用剛抓到的「真人第一名戰力」進行動態通膨加權！
+        const catsList = Array.from({ length: 20 }, (_, i) => {
+          const catNum = i + 1;
+          let catPower = 0;
+          if (catNum === 1) {
+            catPower = Math.floor(480 * (maxRealPlayerPower * 0.002) + 200);
+          } else if (catNum === 2) {
+            catPower = Math.floor(460 * (maxRealPlayerPower * 0.0015) + 100);
+          } else {
+            const elapsedSeconds = 86400 - (timeToReset || 86400);
+            const liveVolatility = Math.floor(Math.sin(Math.floor(elapsedSeconds / 3) + catNum) * 15);
+            catPower = Math.floor((500 - catNum * 22) * (1 + chestLevel * 0.05)) + liveVolatility;
+          }
+          return {
+            name: `🐱 貓咪${catNum}號`,
+            power: catPower > 10 ? catPower : 10,
+            isPlayer: false
+          };
+        });
+
+        // 5. 終極合體大混戰！把真人玩家與動態加權貓咪全部塞進同一個陣列，並進行全服總排序！
+        const finalMixedLeaderboard = [...realPlayersList, ...catsList];
+        finalMixedLeaderboard.sort((a, b) => b.power - a.power);
+
+        // 6. 更新到畫面上
+        setGlobalPlayers(finalMixedLeaderboard);
       } catch (e) { console.error("全服綜合榜單同步失敗:", e); }
     };
+
     fetchGlobalData();
-  }, [user, stats.power, timeToReset]); // 👈 只要你戰力變強或時間跳動，立刻即時重新加權排序！
+  }, [user, stats.power, isCloudDataLoaded]); // 🧙‍♂️ 核心修正：當你成功登入、或是換衣服戰力改變的瞬間，100% 強制開機去雲端撈取！
+
 
   // 即時計算我的真實排名
   const currentMyRank = displayLeaderboard.findIndex(p => p.isPlayer) + 1;
