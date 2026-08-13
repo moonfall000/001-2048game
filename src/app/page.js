@@ -828,7 +828,7 @@ export default function Game() {
       //貓咪算法
       // 🎯 規律衰減核心：計算這隻貓咪的「咬合係數」
       // 除以 catNum 的增長，讓加權幅度以規律的斜率瘋狂縮小！ 基本上50名後吃不到加權
-      let Numofcat = (575 - catNum * 10);
+      let Numofcat = (620 - catNum * 10);
       if (Numofcat <= 0) { Numofcat = 1};
       const weightFactor = (Numofcat) * 0.0014 / Math.pow(catNum, 0.995); // 0.65次方控制衰減平滑度，名次越後越咬不動
       
