@@ -127,11 +127,11 @@ export default function Game() {
       const catNum = i + 1;
       
       // 🎯 規律衰減核心：計算這隻貓咪的「咬合係數」
-      // 貓咪 1 號係數最大 (0.00200)，名次越後面，除以 catNum 的增長，讓加權幅度以規律的斜率瘋狂縮小！
-      const weightFactor = (500 - catNum * 8) * 0.002 / Math.pow(catNum, 0.85); // 0.65次方控制衰減平滑度，名次越後越咬不動
+      // 除以 catNum 的增長，讓加權幅度以規律的斜率瘋狂縮小！
+      const weightFactor = (700 - catNum * 12) * 0.002 / Math.pow(catNum, 0.95); // 0.65次方控制衰減平滑度，名次越後越咬不動
       
       // 🎮 基礎保底戰力也隨著排名由大到小規律遞減
-      const basePower = Math.max(10, 500 - catNum * 8) * (1 + chestLevel * 0.05);
+      const basePower = Math.max(10, 5000 - catNum * 48) * (1 + chestLevel * 0.05);
       
       // ⚔️ 最終計算：真・第一名戰力 * 專屬衰減係數 + 保底基底
       let finalCatPower = Math.floor(realTopOnePower * weightFactor) + Math.floor(basePower);
