@@ -1,3 +1,5 @@
 //清除舊的終端背景執行 可以還原至http://localhost:3000
 Stop-Process -Name "node" -Force -ErrorAction SilentlyContinue
 npm run dev
+日誌
+//2026/8/13 23:03此版本為基礎Beta版本 要回溯可用此版本 擁有正確連線排行榜及變動的貓咪戰力共100隻

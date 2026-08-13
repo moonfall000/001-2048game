@@ -93,10 +93,12 @@ export default function Game() {
     // 🌐 核心新增：排行榜搜尋、滑桿下拉與個人排名狀態
   const [searchQuery, setSearchQuery] = useState(''); // 儲存使用者輸入的搜尋字串
   const [myRank, setMyRank] = useState('--'); // 儲存玩家在全服的真實名次
+  const [catCount, setCatCount] = useState(100); // 🐱 核心新增：控制假貓咪數量的變數，預設為 20 隻
+
   // 儲存雲端撈出的所有玩家+貓咪完整名冊
     // 核心修正：開局直接把 🐱 貓咪 1 號到 20 號寫死塞入 allPlayers 狀態，保證搜尋滑桿絕對不落空！
   const [allPlayers, setAllPlayers] = useState([
-    { name: '🐱 貓咪1號', power: 480 * 0.876543212345, isPlayer: false },
+    { name: '🐱 貓咪1號', power: 480, isPlayer: false },
     { name: '🐱 貓咪2號', power: 460, isPlayer: false },
     { name: '🐱 貓咪3號', power: 440, isPlayer: false },
     { name: '🐱 貓咪4號', power: 420, isPlayer: false },
@@ -118,33 +120,29 @@ export default function Game() {
     { name: '🐱 貓咪20號', power: 100, isPlayer: false },
   ]);
   // 修正：將寫死的貓咪名單與你（玩家）的真實戰力即時大排序，並精準計算個人全服排名
-  // 🟢 完美修正：保留全服真人玩家，僅對名冊內的假貓咪進行第一名戰力動態加權！
+  // 🟢 完美修正：保留全服真人玩家，並根據 catCount 變數動態生成 100 隻第一名戰力加權貓咪！
   const displayLeaderboard = (() => {
     // 🧙‍♂️ 第一步：找出目前純玩家維度裡的最強戰力（當作貓咪的加權火車頭）
     const topPlayerPower = Math.max(stats.power, 500);
 
-    // 🧙‍♂️ 第二步：讀取包含 3 位真人的 allPlayers 狀態，並用 map 迴圈只對假貓咪進行動態公式加權！
-    let list = allPlayers.map(p => {
-      // 如果這個人是真人玩家，原封不動保留他的真實名字與戰力，絕不洗掉！
-      if (p.isPlayer || !p.name.startsWith('🐱')) {
-        return p;
-      }
+    // 🧙‍♂️ 第二步：從撈回來的名冊中，先精準過濾出「所有純真人玩家」的資料，絕不洗掉！
+    let pureRealPlayers = allPlayers.filter(p => p.isPlayer || !p.name.startsWith('🐱'));
 
-      // 如果這個人是假貓咪，根據名次進行你想要的第一名戰力階梯式動態加權！
-      const catName = p.name;
-      const catNum = parseInt(catName.replace('🐱 貓咪', '').replace('號', '')) || 1;
+    // 🧙‍♂️ 第三步：根據上面設定的 catCount 數量，全自動動態生成 100 隻最新規格的假貓咪清單！
+    const catsList = Array.from({ length: catCount }, (_, i) => {
+      const catNum = i + 1;
       let finalCatPower = 0;
 
       if (catNum === 1) {
         finalCatPower = Math.floor(480 * (topPlayerPower * 0.002) + 200); 
       } else if (catNum === 2) {
-        finalCatPower = Math.floor(460 * (topPlayerPower * 0.0015) + 100);
+        finalCatPower = Math.floor(460 * (topPlayerPower * 0.001) + 100);
       } else if (catNum === 3) {
-        finalCatPower = Math.floor(440 * (topPlayerPower * 0.0012) + 80);
+        finalCatPower = Math.floor(440 * (topPlayerPower * 0.0002) + 80);
       } else if (catNum === 4) {
-        finalCatPower = Math.floor(420 * (topPlayerPower * 0.001) + 50);
+        finalCatPower = Math.floor(420 * (topPlayerPower * 0.0001) + 50);
       } else if (catNum === 5) {
-        finalCatPower = Math.floor(400 * (topPlayerPower * 0.0005) + 20);
+        finalCatPower = Math.floor(400 * (topPlayerPower * 0.00005) + 20);
       } else {
         const elapsedSeconds = 86400 - (timeToReset || 86400);
         const liveVolatility = Math.floor(Math.sin(Math.floor(elapsedSeconds / 3) + catNum) * 15);
@@ -152,12 +150,16 @@ export default function Game() {
       }
 
       return {
-        ...p,
-        power: finalCatPower > 10 ? finalCatPower : 10
+        name: `🐱 貓咪${catNum}號`,
+        power: finalCatPower > 10 ? finalCatPower : 10,
+        isPlayer: false
       };
     });
 
-    // 第三步：檢查是否已經把自己塞進去了，如果沒有則補上（或即時同步自己的最新戰力）
+    // 第四步：將所有真實玩家，與剛剛根據 catCount 生成好的 100 隻貓咪進行大合體
+    let list = [...pureRealPlayers, ...catsList];
+
+    // 第五步：檢查是否已經把自己塞進去了，如果沒有則補上（或即時同步自己的最新戰力）
     const playerIndex = list.findIndex(p => p.isPlayer);
     if (playerIndex !== -1) {
       list[playerIndex].power = stats.power;
@@ -166,10 +168,11 @@ export default function Game() {
       list.push({ name: authInput.username || '你（玩家）', power: stats.power, isPlayer: true });
     }
 
-    // 第四步：全服混合大排序！
+    // 第六步：全服混合大排序！
     list.sort((a, b) => b.power - a.power);
     return list;
   })();
+
 
   // 即時計算我的真實排名
   const currentMyRank = displayLeaderboard.findIndex(p => p.isPlayer) + 1;
