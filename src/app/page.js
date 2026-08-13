@@ -117,11 +117,13 @@ export default function Game() {
     { name: '🐱 貓咪19號', power: 120, isPlayer: false },
     { name: '🐱 貓咪20號', power: 100, isPlayer: false },
   ]);
-  // 核心修正：將寫死的貓咪名單與你（玩家）的真實戰力即時大排序，並精準計算個人全服排名
-      // 🌐 核心修正：將顯示名冊與全服動態玩家狀態 (globalPlayers) 綁定，其他人絕對不再消失！
-  const displayLeaderboard = globalPlayers || [];
-  const filteredLeaderboard = displayLeaderboard.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()));
-    // 🌐 終極大團圓引擎：從 Supabase 撈取全服所有真人玩家，並在原地塞入「第一名戰力加權」的 20 隻同步貓咪！
+  // 修正：將寫死的貓咪名單與你（玩家）的真實戰力即時大排序，並精準計算個人全服排名
+      // 🌐 修正：將顯示名冊與全服動態玩家狀態 (globalPlayers) 綁定，其他人絕對不再消失！
+        // 🧙‍♂️ 導正：直接將大排序指向 globalPlayers 狀態！只要雲端一撈到真人，畫面 100% 即時刷新！
+  const filteredLeaderboard = (globalPlayers && globalPlayers.length > 0 ? globalPlayers : displayLeaderboard).filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()));
+  const currentMyRank = (globalPlayers && globalPlayers.length > 0 ? globalPlayers : displayLeaderboard).findIndex(p => p.isPlayer) + 1;
+
+      // 🌐 終極大團圓引擎：從 Supabase 撈取全服所有真人玩家，並在原地塞入「第一名戰力加權」的 20 隻同步貓咪！
   // 🌐 終極大團圓引擎：從 Supabase 撈取全服所有真人玩家，並在原地塞入「第一名戰力加權」的 20 隻同步貓咪！
   const [globalPlayers, setGlobalPlayers] = useState([]);
 
@@ -839,7 +841,7 @@ export default function Game() {
                   );
                 })
               ) : (
-                <div style={{ color: '#475569', textAlign: 'center', padding: '20px 0', fontStyle: 'italic' }}>查無此菇勇者玩家...</div>
+                <div style={{ color: '#475569', textAlign: 'center', padding: '20px 0', fontStyle: 'italic' }}>查無此貓咪...</div>
               )}
             </div>
 
