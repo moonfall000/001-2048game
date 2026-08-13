@@ -98,56 +98,48 @@ export default function Game() {
   // 儲存雲端撈出的所有玩家+貓咪完整名冊
     // 核心修正：開局直接把 🐱 貓咪 1 號到 20 號寫死塞入 allPlayers 狀態，保證搜尋滑桿絕對不落空！
   const [allPlayers, setAllPlayers] = useState([
-    { name: '🐱 貓咪1號', power: 480, isPlayer: false },
-    { name: '🐱 貓咪2號', power: 460, isPlayer: false },
-    { name: '🐱 貓咪3號', power: 440, isPlayer: false },
-    { name: '🐱 貓咪4號', power: 420, isPlayer: false },
-    { name: '🐱 貓咪5號', power: 400, isPlayer: false },
-    { name: '🐱 貓咪6號', power: 380, isPlayer: false },
-    { name: '🐱 貓咪7號', power: 360, isPlayer: false },
-    { name: '🐱 貓咪8號', power: 340, isPlayer: false },
-    { name: '🐱 貓咪9號', power: 320, isPlayer: false },
-    { name: '🐱 貓咪10號', power: 300, isPlayer: false },
-    { name: '🐱 貓咪11號', power: 280, isPlayer: false },
-    { name: '🐱 貓咪12號', power: 260, isPlayer: false },
-    { name: '🐱 貓咪13號', power: 240, isPlayer: false },
-    { name: '🐱 貓咪14號', power: 220, isPlayer: false },
-    { name: '🐱 貓咪15號', power: 200, isPlayer: false },
-    { name: '🐱 貓咪16號', power: 180, isPlayer: false },
-    { name: '🐱 貓咪17號', power: 160, isPlayer: false },
-    { name: '🐱 貓咪18號', power: 140, isPlayer: false },
-    { name: '🐱 貓咪19號', power: 120, isPlayer: false },
-    { name: '🐱 貓咪20號', power: 100, isPlayer: false },
+    //{ name: '🐱 貓咪1號', power: 480, isPlayer: false },
+    //{ name: '🐱 貓咪2號', power: 460, isPlayer: false },
+    //{ name: '🐱 貓咪3號', power: 440, isPlayer: false },
   ]);
   // 修正：將寫死的貓咪名單與你（玩家）的真實戰力即時大排序，並精準計算個人全服排名
-  // 🟢 完美修正：保留全服真人玩家，並根據 catCount 變數動態生成 100 隻第一名戰力加權貓咪！
+  // 🟢 完美修正：真・全服第一名加權！精準抓取所有人中的最強戰力，作為貓咪動態膨脹的火車頭！
+    // 🟢 完美修正：真・全服 100 隻貓咪集體咬合引擎！名次越後面，對第一名戰力的咬合幅度與敏感度全自動階梯式衰減！
   const displayLeaderboard = (() => {
-    // 🧙‍♂️ 第一步：找出目前純玩家維度裡的最強戰力（當作貓咪的加權火車頭）
-    const topPlayerPower = Math.max(stats.power, 500);
-
-    // 🧙‍♂️ 第二步：從撈回來的名冊中，先精準過濾出「所有純真人玩家」的資料，絕不洗掉！
+    // 🧙‍♂️ 第一步：過濾出名冊內所有的「純真人玩家」（包含那 3 位真人與你）
     let pureRealPlayers = allPlayers.filter(p => p.isPlayer || !p.name.startsWith('🐱'));
 
-    // 🧙‍♂️ 第三步：根據上面設定的 catCount 數量，全自動動態生成 100 隻最新規格的假貓咪清單！
+    // 確保玩家自己的最新實時數據在裡面
+    const meIndex = pureRealPlayers.findIndex(p => p.isPlayer);
+    if (meIndex !== -1) {
+      pureRealPlayers[meIndex].power = stats.power;
+    } else {
+      pureRealPlayers.push({ name: authInput.username || '你（玩家）', power: stats.power, isPlayer: true });
+    }
+
+    // 🧙‍♂️ 第二步：精準挑出目前全伺服器所有真人玩家中的「實時最強天花板戰力」
+    const realTopOnePower = pureRealPlayers.length > 0 
+      ? Math.max(...pureRealPlayers.map(p => p.power || 500)) 
+      : 500;
+
+    // 🧙‍♂️ 第三步：根據 catCount (100隻) 數量，全自動動態生成規律衰減的假貓咪清單！
     const catsList = Array.from({ length: catCount }, (_, i) => {
       const catNum = i + 1;
-      let finalCatPower = 0;
+      
+      // 🎯 規律衰減核心：計算這隻貓咪的「咬合係數」
+      // 貓咪 1 號係數最大 (0.00200)，名次越後面，除以 catNum 的增長，讓加權幅度以規律的斜率瘋狂縮小！
+      const weightFactor = 0.002 / Math.pow(catNum, 0.65); // 0.65次方控制衰減平滑度，名次越後越咬不動
+      
+      // 🎮 基礎保底戰力也隨著排名由大到小規律遞減
+      const basePower = Math.max(10, 500 - catNum * 8) * (1 + chestLevel * 0.05);
+      
+      // ⚔️ 最終計算：真・第一名戰力 * 專屬衰減係數 + 保底基底
+      let finalCatPower = Math.floor(realTopOnePower * weightFactor) + Math.floor(basePower);
 
-      if (catNum === 1) {
-        finalCatPower = Math.floor(480 * (topPlayerPower * 0.002) + 200); 
-      } else if (catNum === 2) {
-        finalCatPower = Math.floor(460 * (topPlayerPower * 0.001) + 100);
-      } else if (catNum === 3) {
-        finalCatPower = Math.floor(440 * (topPlayerPower * 0.0002) + 80);
-      } else if (catNum === 4) {
-        finalCatPower = Math.floor(420 * (topPlayerPower * 0.0001) + 50);
-      } else if (catNum === 5) {
-        finalCatPower = Math.floor(400 * (topPlayerPower * 0.00005) + 20);
-      } else {
-        const elapsedSeconds = 86400 - (timeToReset || 86400);
-        const liveVolatility = Math.floor(Math.sin(Math.floor(elapsedSeconds / 3) + catNum) * 15);
-        finalCatPower = Math.floor((500 - catNum * 22) * (1 + chestLevel * 0.05)) + liveVolatility;
-      }
+      // 🎲 偽隨機跳動：一樣引入全域同步時間秒數 (timeToReset)，讓 100 隻貓咪有在線上呼吸的換裝跳動感
+      const elapsedSeconds = 86400 - (timeToReset || 86400);
+      const liveVolatility = Math.floor(Math.sin(Math.floor(elapsedSeconds / 3) + catNum) * 15);
+      finalCatPower += liveVolatility;
 
       return {
         name: `🐱 貓咪${catNum}號`,
@@ -156,22 +148,14 @@ export default function Game() {
       };
     });
 
-    // 第四步：將所有真實玩家，與剛剛根據 catCount 生成好的 100 隻貓咪進行大合體
+    // 第四步：將所有真實玩家與規律咬合的 100 隻貓咪進行世紀大合體
     let list = [...pureRealPlayers, ...catsList];
 
-    // 第五步：檢查是否已經把自己塞進去了，如果沒有則補上（或即時同步自己的最新戰力）
-    const playerIndex = list.findIndex(p => p.isPlayer);
-    if (playerIndex !== -1) {
-      list[playerIndex].power = stats.power;
-      list[playerIndex].name = authInput.username || '你（玩家）';
-    } else {
-      list.push({ name: authInput.username || '你（玩家）', power: stats.power, isPlayer: true });
-    }
-
-    // 第六步：全服混合大排序！
+    // 第五步：全服混合大排序！
     list.sort((a, b) => b.power - a.power);
     return list;
   })();
+
 
 
   // 即時計算我的真實排名
