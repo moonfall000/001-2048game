@@ -15,4 +15,5 @@ export default function RootLayout({ children }) {
 //git add .
 //git commit -m "fix: anti-wipe cloud save engine"
 //git push
+//Get-ChildItem -Recurse -Exclude "node_modules", ".next", ".git" | Select-Object @{Name="路徑"; Expression={$_.FullName.Replace((Get-Location).Path, "")}}
 
