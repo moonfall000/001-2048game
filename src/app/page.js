@@ -686,8 +686,8 @@ export default function Game() {
       {/* 頂部數據看板 */}
       <header style={{ maxWidth: '1200px', margin: '0 auto 20px auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#0f172a', border: '1px solid #1e293b', padding: '16px', borderRadius: '16px' }}>
         <div>
-          <h1 style={{ margin: 0, fontSize: '20px', fontWeight: '900', color: '#f59e0b' }}>2048貓咪開箱傳說</h1>
-          <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#94a3b8' }}>編寫狀態 智慧自動掛機開箱</p>
+          <h1 style={{ margin: 0, fontSize: '20px', fontWeight: '900', color: '#f59e0b' }}>2048貓咪開箱傳說 金幣版</h1>
+          <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#94a3b8' }}>智慧自動掛機開箱</p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
           <div style={{ backgroundColor: '#020617', padding: '8px 12px', borderRadius: '8px', border: '1px solid #1e293b', color: '#fbbf24', fontWeight: 'bold' }}>🪙 金幣: {gold}</div>
