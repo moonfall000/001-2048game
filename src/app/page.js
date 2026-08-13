@@ -590,7 +590,17 @@ export default function Game() {
   };
 
   const equipItem = () => { if (!newDrop) return; setEquipped(prev => ({ ...prev, [newDrop.slot]: newDrop })); setNewDrop(null); };
-  const sellItem = () => { if (!newDrop) return; setGold(prev => prev + newDrop.sellValue); setNewDrop(null); };
+    // 🧙‍♂️ 核心修正：分解舊的/新的裝備後，100% 自動重啟掛機，讓永動箱子繼續瘋狂推進！
+  const sellItem = () => {
+    if (!newDrop) return;
+    setGold(g => g + newDrop.sellValue);
+    setNewDrop(null);
+    
+    // 💡 靈魂新增：只要庫存還有箱子，分解完的瞬間，全自動無感重新亮起「自動開箱」！
+    if (chestCount > 0) {
+      setIsAutoOpen(true);
+    }
+  };
   const reset2048 = () => { let eb = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]; eb = addRandomTile(eb); eb = addRandomTile(eb); setBoard(eb); setScore(0); };
 
   const currentEquippedItem = newDrop ? equipped[newDrop.slot] : null;
@@ -864,6 +874,20 @@ export default function Game() {
                     <div>防禦: {newDrop.defense} <span style={{ color: '#4ade80' }}>({currentEquippedItem ? `+${newDrop.defense - currentEquippedItem.defense}` : `+${newDrop.defense}`})</span></div>
                     <div>生命: {newDrop.health} <span style={{ color: '#4ade80' }}>({currentEquippedItem ? `+${newDrop.health - currentEquippedItem.health}` : `+${newDrop.health}`})</span></div>
                   </div>
+                    {/* 🧙‍♂️ 核心新增：舊裝備面板！將換下來的裝備同步顯示，並用綠色/紅色即時看出戰力加減 */}
+                  {currentEquippedItem && (
+                    <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px dashed #334155' }}>
+                      <div style={{ padding: '6px', borderRadius: '6px', backgroundColor: '#020617', border: '1px solid #1e293b', fontSize: '11px', marginBottom: '6px' }}>
+                        <span style={{ color: '#64748b' }}>當前穿戴：</span>
+                        <span style={{ color: RARITY_SETTINGS[currentEquippedItem.rarity].color, fontWeight: 'bold' }}>{currentEquippedItem.name}</span>
+                      </div>
+                      <div style={{ backgroundColor: '#020617', padding: '10px', borderRadius: '8px', fontSize: '12px', fontFamily: 'monospace', lineHeight: '1.5' }}>
+                        <div>舊攻擊: {currentEquippedItem.attack} <span style={{ color: newDrop.attack - currentEquippedItem.attack >= 0 ? '#4ade80' : '#f87171' }}>({newDrop.attack - currentEquippedItem.attack >= 0 ? `-${newDrop.attack - currentEquippedItem.attack}` : `+${currentEquippedItem.attack - newDrop.attack}`})</span></div>
+                        <div>舊防禦: {currentEquippedItem.defense} <span style={{ color: newDrop.defense - currentEquippedItem.defense >= 0 ? '#4ade80' : '#f87171' }}>({newDrop.defense - currentEquippedItem.defense >= 0 ? `-${newDrop.defense - currentEquippedItem.defense}` : `+${currentEquippedItem.defense - newDrop.defense}`})</span></div>
+                        <div>舊生命: {currentEquippedItem.health} <span style={{ color: newDrop.health - currentEquippedItem.health >= 0 ? '#4ade80' : '#f87171' }}>({newDrop.health - currentEquippedItem.health >= 0 ? `-${newDrop.health - currentEquippedItem.health}` : `+${currentEquippedItem.health - newDrop.health}`})</span></div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <p style={{ color: '#475569', fontSize: '12px', textAlign: 'center', padding: '30px 0', margin: 0, fontStyle: 'italic' }}>等待神木開啟寶箱...</p>
