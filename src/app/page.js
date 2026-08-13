@@ -118,52 +118,75 @@ export default function Game() {
     { name: '🐱 貓咪20號', power: 100, isPlayer: false },
   ]);
   // 核心修正：將寫死的貓咪名單與你（玩家）的真實戰力即時大排序，並精準計算個人全服排名
-    // 🌐 核心修正：全服絕對同步大排序！用「玩家最高戰力 (含自己與雲端加權)」作為火車頭加權，彻底繞過無窮迴圈死鎖！
-  const displayLeaderboard = (() => {
-    // 🧙‍♂️ 第一步：找出目前純玩家維度裡的最強戰力（拿你個人的最新戰力 stats.power 作為基準火車頭）
-    // 未來如果加上全服 Supabase 玩家，這裡也可以直接讀取雲端第一名的數字，它全域唯一且不依賴貓咪
-    const topPlayerPower = Math.max(stats.power, 500);
+      // 🌐 核心修正：將顯示名冊與全服動態玩家狀態 (globalPlayers) 綁定，其他人絕對不再消失！
+  const displayLeaderboard = globalPlayers || [];
+  const filteredLeaderboard = displayLeaderboard.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()));
+    // 🌐 終極大團圓引擎：從 Supabase 撈取全服所有真人玩家，並在原地塞入「第一名戰力加權」的 20 隻同步貓咪！
+  const [globalPlayers, setGlobalPlayers] = useState([]);
 
-    // 🧙‍♂️ 第二步：用這個「第一名戰力」作為全服動態通膨的加權係數，全自動生成 20 隻貓咪
-    const list = Array.from({ length: 20 }, (_, i) => {
-      const catNum = i + 1;
-      
-      // 🎮 玥楓策劃公式：480 * 第一名戰力 * 0.0001 + 階梯式保底基底
-      let finalCatPower = 0;
-      
-      if (catNum === 1) {
-        // 貓咪 1 號：精準使用第一名戰力加權，永遠壓在最高頂點當全服大魔王！
-        finalCatPower = Math.floor(480 * (topPlayerPower * 0.002) + 200); 
-      } else if (catNum === 2) {
-        // 貓咪 2 號：加權係數稍微降低，卡在第二名
-        finalCatPower = Math.floor(460 * (topPlayerPower * 0.0015) + 100);
-      } else {
-        // 其餘貓咪：根據排名階梯式遞減，並引入全服同步的時間秒數 (timeToReset) 做微幅每秒同步跳動，極度逼真
-        const elapsedSeconds = 86400 - (timeToReset || 86400);
-        const liveVolatility = Math.floor(Math.sin(Math.floor(elapsedSeconds / 3) + catNum) * 15);
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchGlobalData = async () => {
+      try {
+        const { supabase } = await import('../lib/supabase');
         
-        finalCatPower = Math.floor((500 - catNum * 22) * (1 + chestLevel * 0.05)) + liveVolatility;
-      }
+        // 1. 從雲端資料庫 profiles 撈出所有真人在線玩家的暱稱與真實戰力
+        const { data: cloudUsers, error } = await supabase
+          .from('profiles')
+          .select('username, power')
+          .order('power', { ascending: false });
 
-      return {
-        name: `🐱 貓咪${catNum}號`,
-        power: finalCatPower > 10 ? finalCatPower : 10,
-        isPlayer: false
-      };
-    });
+        if (!error && cloudUsers) {
+          // 2. 跨時空精準定位：找出目前全伺服器所有「真人玩家」裡的最強天花板戰力
+          const maxRealPlayerPower = cloudUsers.length > 0 ? Math.max(...cloudUsers.map(u => u.power || 500)) : 500;
 
-    // 第三步：把正在實時開箱、戰力儲存在 profiles 資料庫裡的你（玩家）自己塞進名單
-    list.push({ 
-      name: authInput.username || '你（玩家）', 
-      power: stats.power, 
-      isPlayer: true 
-    });
+          // 3. 建立真人玩家清單
+          const realPlayersList = cloudUsers.map(u => ({
+            name: u.username || '無名勇者',
+            power: u.power || 0,
+            isPlayer: u.username === authInput.username // 點亮你自己
+          }));
 
-    // 第四步：全服大排序！
-    list.sort((a, b) => b.power - a.power);
-    return list;
-  })();
+          // 4. 原地動態生成 20 隻假貓咪，精準使用剛抓到的「真人第一名戰力」進行動態通膨加權！
+          const catsList = Array.from({ length: 20 }, (_, i) => {
+            const catNum = i + 1;
+            
+            let catPower = 0;
+            if (catNum === 1) {
+              // 🐱 貓咪 1 號：精準使用全服玩家最強戰力加權，永遠卡在最頂端當全服終極大魔王！
+              catPower = Math.floor(480 * (maxRealPlayerPower * 0.002) + 200);
+            } else if (catNum === 2) {
+              catPower = Math.floor(460 * (maxRealPlayerPower * 0.0015) + 100);
+            } else {
+              // 其餘貓咪：階梯式遞減，並引入全域同步的時間秒數 (timeToReset) 模擬動態跳動
+              const elapsedSeconds = 86400 - (timeToReset || 86400);
+              const liveVolatility = Math.floor(Math.sin(Math.floor(elapsedSeconds / 3) + catNum) * 15);
+              catPower = Math.floor((500 - catNum * 22) * (1 + chestLevel * 0.05)) + liveVolatility;
+            }
 
+            return {
+              name: `🐱 貓咪${catNum}號`,
+              power: catPower > 10 ? catPower : 10,
+              isPlayer: false
+            };
+          });
+
+          // 5. 終極合體大混戰！把真人玩家與動態加權貓咪全部塞進同一個陣列，並進行全服總排序！
+          const finalMixedLeaderboard = [...realPlayersList, ...catsList];
+          finalMixedLeaderboard.sort((a, b) => b.power - a.power);
+
+          // 6. 更新到畫面上
+          setGlobalPlayers(finalMixedLeaderboard);
+        }
+      } catch (e) { console.error("全服綜合榜單同步失敗:", e); }
+    };
+
+    fetchGlobalData();
+    // 每 5 秒鐘全自動在背景無感更新一次，讓你一換裝、或是別的玩家一上線，所有人榜單同步跳動！
+    const syncTimer = setInterval(fetchGlobalData, 5000);
+    return () => clearInterval(syncTimer);
+  }, [user, stats.power, timeToReset]); // 👈 只要你戰力變強或時間跳動，立刻即時重新加權排序！
 
   // 即時計算我的真實排名
   const currentMyRank = displayLeaderboard.findIndex(p => p.isPlayer) + 1;
@@ -172,8 +195,6 @@ export default function Game() {
   const filteredLeaderboard = displayLeaderboard.filter(p => 
     p.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
-
 
     // 🌐 核心新增：Supabase 線上註冊與登入雲端傳輸函式
   const handleAuth = async (e) => {
