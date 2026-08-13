@@ -118,52 +118,18 @@ export default function Game() {
     { name: '🐱 貓咪20號', power: 100, isPlayer: false },
   ]);
   // 修正：將寫死的貓咪名單與你（玩家）的真實戰力即時大排序，並精準計算個人全服排名
-        // 🧙‍♂️ 終極正名：全服唯一大水管！讓畫面的篩選、名次、全服 3 位真人與假貓咪全部對齊 globalPlayers
-  const displayLeaderboard = globalPlayers && globalPlayers.length > 0 ? globalPlayers : [];
+          // 🟢 完美回溯：將你、其他3位真人(allPlayers)與假貓咪同台的最初正統排序
+  const displayLeaderboard = (() => {
+    let list = [...allPlayers];
+    // 檢查是否已經把自己塞進去了，如果沒有則補上
+    if (!list.some(p => p.isPlayer)) {
+      list.push({ name: authInput.username || '你（玩家）', power: stats.power, isPlayer: true });
+    }
+    list.sort((a, b) => b.power - a.power);
+    return list;
+  })();
+
   const filteredLeaderboard = displayLeaderboard.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()));
-  const currentMyRank = displayLeaderboard.findIndex(p => p.isPlayer) + 1;
-
-      // 🌐 終極大團圓引擎：從 Supabase 撈取全服所有真人玩家，並在原地塞入「第一名戰力加權」的 20 隻同步貓咪！
-  // 🌐 終極大團圓引擎：從 Supabase 撈取全服所有真人玩家，並在原地塞入「第一名戰力加權」的 20 隻同步貓咪！
-    const [globalPlayers, setGlobalPlayers] = useState([]);
-
-  useEffect(() => {
-    if (!user) return;
-    const fetchGlobalData = async () => {
-      try {
-        const { supabase } = await import('../lib/supabase');
-        const { data: cloudUsers, error } = await supabase.from('profiles').select('id, username, power').order('power', { ascending: false });
-        let realPlayersList = [];
-        if (!error && cloudUsers && cloudUsers.length > 0) {
-          realPlayersList = cloudUsers.map(u => ({
-            name: u.username || '無名勇者',
-            power: u.power || 0,
-            isPlayer: u.id === user?.id || u.username === authInput.username
-          }));
-        } else {
-          realPlayersList = [{ name: authInput.username || '你（玩家）', power: stats.power, isPlayer: true }];
-        }
-        const maxRealPlayerPower = realPlayersList.length > 0 ? Math.max(...realPlayersList.map(u => u.power || 500)) : 500;
-        const catsList = Array.from({ length: 20 }, (_, i) => {
-          const catNum = i + 1;
-          let catPower = 0;
-          if (catNum === 1) { catPower = Math.floor(480 * (maxRealPlayerPower * 0.002) + 200); }
-          else if (catNum === 2) { catPower = Math.floor(460 * (maxRealPlayerPower * 0.0015) + 100); }
-          else {
-            const elapsedSeconds = 86400 - (timeToReset || 86400);
-            const liveVolatility = Math.floor(Math.sin(Math.floor(elapsedSeconds / 3) + catNum) * 15);
-            catPower = Math.floor((500 - catNum * 22) * (1 + chestLevel * 0.05)) + liveVolatility;
-          }
-          return { name: `🐱 貓咪${catNum}號`, power: catPower > 10 ? catPower : 10, isPlayer: false };
-        });
-        const finalMixedLeaderboard = [...realPlayersList, ...catsList];
-        finalMixedLeaderboard.sort((a, b) => b.power - a.power);
-        setGlobalPlayers(finalMixedLeaderboard);
-      } catch (e) { console.error(e); }
-    };
-    fetchGlobalData();
-  }, [user, stats.power, isCloudDataLoaded]);
-
 
   // 即時計算我的真實排名
   const currentMyRank = displayLeaderboard.findIndex(p => p.isPlayer) + 1;
