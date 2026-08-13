@@ -637,7 +637,7 @@ export default function Game() {
       <div style={{ minHeight: '100vh', backgroundColor: '#020617', color: '#f8fafc', padding: '20px', fontFamily: 'sans-serif', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ backgroundColor: '#0f172a', border: '2px solid #fbbf24', padding: '30px', borderRadius: '20px', width: '100%', maxWidth: '400px', boxShadow: '0 10px 25px rgba(0,0,0,0.7)', textAlign: 'center' }}>
           <h1 style={{ margin: '0 0 10px 0', fontSize: '24px', fontWeight: '900', color: '#fbbf24' }}>2048貓咪開箱傳說</h1>
-          <p style={{ margin: '0 0 20px 0', fontSize: '13px', color: '#94a3b8' }}>⚔️ 真實全服多人連線 × 2048 永動金幣版 ⚔️</p>
+          <p style={{ margin: '0 0 20px 0', fontSize: '13px', color: '#94a3b8' }}>⚔️ 真實全服多人連線 × 2048 金幣版 ⚔️</p>
           
           <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', backgroundColor: '#020617', padding: '4px', borderRadius: '8px' }}>
             <button onClick={() => setAuthStyle('login')} style={{ flex: 1, padding: '8px', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '12px', backgroundColor: authMode === 'login' ? '#fbbf24' : 'transparent', color: authMode === 'login' ? '#000' : '#fff' }}>密碼登入</button>
@@ -705,7 +705,7 @@ export default function Game() {
         <div style={boxStyle}>
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-              <h2 style={{ margin: 0, fontSize: '15px', color: '#34d399', fontWeight: 'bold' }}>🧩 2048 永動金幣機</h2>
+              <h2 style={{ margin: 0, fontSize: '15px', color: '#34d399', fontWeight: 'bold' }}>🧩 2048 金幣機</h2>
               <span style={{ fontSize: '12px', color: '#94a3b8' }}>積分: {score}</span>
             </div>
             {/* 4x4 原生 Grid 棋盤 */}
