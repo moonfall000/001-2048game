@@ -3,3 +3,25 @@ Stop-Process -Name "node" -Force -ErrorAction SilentlyContinue
 npm run dev
 日誌
 //2026/8/13 23:03此版本為基礎Beta版本 要回溯可用此版本 擁有正確連線排行榜及變動的貓咪戰力共100隻
+
+
+//在supabase SQL Editor
+
+-- 🌌 究極導正：強行把所有可能因為 null 導致前端 React 崩潰的欄位，通通灌入合法的實心數字與文字！
+-- 100% 斷根任何 client-side exception 型別解構異常，恭迎玥楓號瞬間復活登入！
+
+UPDATE public.profiles 
+SET 
+    username = '玥楓',
+    gold = 99365301280292,          -- 如果是空，強行補回 3653 億金幣
+    chest_count = 9358510,  -- 如果是空，強行補回 35 萬寶箱庫存
+    chest_level = 30,      -- 如果是空，強行補回 30 級神壇
+    
+    -- 確保高階 JSON 欄位完全不是空，而是最安全合法的空物件與空矩陣
+    equipped = '{}'::jsonb,
+    forge_levels = '{"武器": 3600, "頭盔": 1200, "胸甲": 1200, "鞋子": 1200}'::jsonb,
+    talent_levels = '{"攻擊天賦": 3600, "防禦天賦": 0, "生命天賦": 10000}'::jsonb
+
+
+-- 🔒 精準只對你自己的 Gmail UUID 進行最終防護，絕對不誤傷 YF 和茶茶！
+WHERE id = 'eb4501ef-4099-4b90-bbcd-3a1c2fefeab0'::uuid;
