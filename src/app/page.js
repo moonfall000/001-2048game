@@ -95,7 +95,7 @@ export default function Game() {
   const [chestCount, setChestCount] = useState(100);
   const [chestLevel, setChestLevel] = useState(1);
   const [equipped, setEquipped] = useState({ '武器': null, '頭盔': null, '胸甲': null, '鞋子': null });
-    // 🔨 核心新增：儲存四個裝備欄位的獨立鍛造等級，預設皆為 1 級
+    // 🔨 核心新增：儲存四個裝備欄位的獨立鍛造等級，預設皆為 0 級
   const [forgeLevels, setForgeLevels] = useState({ "武器": 0, "頭盔": 0, "胸甲": 0, "鞋子": 0 });
     // 🌌 核心新增：儲存天賦等級狀態，預設皆為 0 級開荒，升級門檻 5 億金幣起步
   const [talentLevels, setTalentLevels] = useState({ "攻擊天賦": 0, "防禦天賦": 0, "生命天賦": 0 });
@@ -733,7 +733,7 @@ export default function Game() {
   // 🌌 核心修正：天賦升級按鈕邏輯！採用實心拆解，確保 100% 觸發 React 狀態變更與自動存檔！
     const upgradeTalent = (talentName) => {
     const currentLv = talentLevels[talentName] || 0;
-    const cost = 500000000 + currentLv * currentLv * 200000000;
+    const cost = 500000000 + currentLv * currentLv * 20000000;
     
     if (gold < cost) return alert(`🪙 金幣餘額不足！升級此天賦需要 ${cost >= 100000000 ? `${(cost/100000000).toFixed(1)}億` : cost.toLocaleString()} 金幣！`);
     
@@ -973,7 +973,7 @@ export default function Game() {
                     </div>
                     {/* 一鍵升級鍛造欄位按鈕 */}
                     <button onClick={() => upgradeForge(slot)} style={{ width: '100%', marginTop: '4px', padding: '4px 8px', backgroundColor: gold >= forgeCost ? '#1e293b' : '#090d16', color: gold >= forgeCost ? '#38bdf8' : '#475569', border: `1px solid ${gold >= forgeCost ? '#38bdf8' : '#1e293b'}`, borderRadius: '6px', cursor: gold >= forgeCost ? 'pointer' : 'not-allowed', fontSize: '11px', fontWeight: 'bold', textAlign: 'center', transition: '0.2s' }}>
-                      ⚡ 消耗 🪙{forgeCost.toLocaleString()} ➔ 鍛造升級 +1%
+                      ⚡ 消耗 🪙{forgeCost.toLocaleString()} ➔ 鍛造升級 +0.1%
                     </button>
                   </div>
                 );
