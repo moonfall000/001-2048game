@@ -389,9 +389,9 @@ export default function Game() {
 
             forge_levels: forgeLevels,
             talent_levels: talentLevels, // 🌌 核心新增：自動將最新天賦等級實時同步進 Supabase 資料庫
-             //"攻擊天賦": talentLevels["攻擊天賦"] !== undefined ? talentLevels["攻擊天賦"] : 0,
-              //"防禦天賦": talentLevels["防禦天賦"] !== undefined ? talentLevels["防禦天賦"] : 0,
-              //"生命天賦": talentLevels["生命天賦"] !== undefined ? talentLevels["生命天賦"] : 0
+              "攻擊天賦": talentLevels["攻擊天賦"] !== undefined ? talentLevels["攻擊天賦"] : 0,
+              "防禦天賦": talentLevels["防禦天賦"] !== undefined ? talentLevels["防禦天賦"] : 0,
+              "生命天賦": talentLevels["生命天賦"] !== undefined ? talentLevels["生命天賦"] : 0
 
           })
           //讀檔，只看 user.id 的標準 SQL 比對線
