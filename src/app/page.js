@@ -1057,8 +1057,11 @@ export default function Game() {
       try {
                 const { supabase } = await import('../lib/supabase');
 
-        await supabase
-          .from('profiles')
+          // 🌌 終極修正：天賦鋼鐵防空鎖！確保攻擊、防禦、生命三個天賦在 React 記憶體中 100% 安全落地，否則絕對攔截、拒絕上傳！
+          if (talentLevels && (talentLevels["攻擊天賦"] === undefined || talentLevels["防禦天賦"] === undefined || talentLevels["生命天賦"] === undefined)) {
+            return; 
+          }
+        await supabase .from('profiles')
           .update({
             gold: gold,
             chest_count: chestCount,
