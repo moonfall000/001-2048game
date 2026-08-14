@@ -1047,7 +1047,9 @@ export default function Game() {
     // 🌐 核心修正：將單機快取存檔，升級為雲端全自動即時同步資料庫引擎
       // 🌐 核心修正：雙重鋼鐵防禦！如果玩家是剛註冊新角（此時 stats.power 應為初始），或者「剛登入但雲端舊檔還沒安全下載完畢」，一律死死攔截上傳，拒絕洗掉紀錄！
   useEffect(() => {
-    if (!isLoaded || !user || (!isCloudDataLoaded && gold === 500 && chestCount === 100)) return;
+        // 🌌 修正：如果玩家剛登入、且雲端的真實天賦紀錄還沒 100% 安全下載到 React 之前，一律死死攔截上傳，拒絕扣錢洗存檔！
+    if (!isLoaded || !user || !isCloudDataLoaded || !talentLevels || typeof talentLevels !== 'object') return;
+
 
     // 建立一個防抖/延時上傳，避免玩家玩 2048 按太快導致頻繁呼叫雲端資料庫卡死
     const syncCloudData = async () => {
