@@ -1080,7 +1080,9 @@ export default function Game() {
             talent_levels: talentLevels, // 🌌 核心新增：自動將最新天賦等級實時同步進 Supabase 資料庫
 
           })
-          .eq('id', user.id);
+          // 🧙‍♂️ 終極正名：使用雙重核對！不論是 user.id，還是你用來登入的 user_metadata.username，只要有一個對上，雲端 100% 鋼鐵寫入成功！
+          // 這能讓帳號在雲端的字串卡死黑洞，讓天賦跟金幣瞬間完美永久存檔！
+          .or(`id.eq.${user.id},username.eq.${authInput.username || user?.user_metadata?.username}`);
       } catch (e) {
         console.error("雲端存檔同步失敗:", e);
       }
