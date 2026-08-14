@@ -33,11 +33,16 @@ const CHEST_LEVEL_CONFIGS = {
   28: { cost: 200000000, rates: { '普通': 0.00, '優秀': 0.00, '精良': 0.00, '史詩': 0.00, '傳說': 0.00, '神話': 0.00, '不朽': 0.52, '超越': 0.28, '鎏金': 0.155, '永恆': 0.045, '至尊': 0 } },
   29: { cost: 300000000, rates: { '普通': 0.00, '優秀': 0.00, '精良': 0.00, '史詩': 0.00, '傳說': 0.00, '神話': 0.00, '不朽': 0.40, '超越': 0.35, '鎏金': 0.202, '永恆': 0.048, '至尊': 0 } },
   30: { cost: 500000000, rates: { '普通': 0.00, '優秀': 0.00, '精良': 0.00, '史詩': 0.00, '傳說': 0.00, '神話': 0.00, '不朽': 0.25, '超越': 0.40, '鎏金': 0.30, '永恆': 0.049999 , '至尊': 0.000001 } },
-  31: { cost: 500000000, rates: { '普通': 0.00, '優秀': 0.00, '精良': 0.00, '史詩': 0.00, '傳說': 0.00, '神話': 0.00, '不朽': 0.2, '超越': 0.42, '鎏金': 0.32, '永恆': 0.05 , '至尊': 0.009999, '無上': 0.000001  } },
-  32: { cost: 500000000, rates: { '普通': 0.00, '優秀': 0.00, '精良': 0.00, '史詩': 0.00, '傳說': 0.00, '神話': 0.00, '不朽': 0.15, '超越': 0.4, '鎏金': 0.35, '永恆': 0.075 , '至尊': 0.025 } },
-  33: { cost: 500000000, rates: { '普通': 0.00, '優秀': 0.00, '精良': 0.00, '史詩': 0.00, '傳說': 0.00, '神話': 0.00, '不朽': 0.1, '超越': 0.4, '鎏金': 0.3, '永恆': 0.1 , '至尊': 0.08, '無上': 0.02 } },
-  34: { cost: 500000000, rates: { '普通': 0.00, '優秀': 0.00, '精良': 0.00, '史詩': 0.00, '傳說': 0.00, '神話': 0.00, '不朽': 0.05, '超越': 0.35, '鎏金': 0.33, '永恆': 0.16 , '至尊': 0.085, '無上': 0.025  } },
-  35: { cost: 500000000, rates: { '普通': 0.00, '優秀': 0.00, '精良': 0.00, '史詩': 0.00, '傳說': 0.00, '神話': 0.00, '不朽': 0.0, '超越': 0.0, '鎏金': 0.3, '永恆': 0.5 , '至尊': 0.1, '無上': 0.1  } },
+  31: { cost: 1000000000, rates: { '普通': 0.00, '優秀': 0.00, '精良': 0.00, '史詩': 0.00, '傳說': 0.00, '神話': 0.00, '不朽': 0.2, '超越': 0.42, '鎏金': 0.32, '永恆': 0.05 , '至尊': 0.009999, '無上': 0.000001  } },
+  32: { cost: 2000000000, rates: { '普通': 0.00, '優秀': 0.00, '精良': 0.00, '史詩': 0.00, '傳說': 0.00, '神話': 0.00, '不朽': 0.15, '超越': 0.4, '鎏金': 0.35, '永恆': 0.06 , '至尊': 0.025, '無上': 0.015  } },
+  33: { cost: 5000000000, rates: { '普通': 0.00, '優秀': 0.00, '精良': 0.00, '史詩': 0.00, '傳說': 0.00, '神話': 0.00, '不朽': 0.1, '超越': 0.4, '鎏金': 0.3, '永恆': 0.1 , '至尊': 0.08, '無上': 0.02 } },
+  34: { cost: 10000000000, rates: { '普通': 0.00, '優秀': 0.00, '精良': 0.00, '史詩': 0.00, '傳說': 0.00, '神話': 0.00, '不朽': 0.05, '超越': 0.35, '鎏金': 0.33, '永恆': 0.16 , '至尊': 0.085, '無上': 0.025  } },
+  35: { cost: 20000000000, rates: { '普通': 0.00, '優秀': 0.00, '精良': 0.00, '史詩': 0.00, '傳說': 0.00, '神話': 0.00, '不朽': 0, '超越': 0, '鎏金': 0.3, '永恆': 0.5 , '至尊': 0.1, '無上': 0.1  } },
+  36: { cost: 40000000000, rates: { '普通': 0.00, '優秀': 0.00, '精良': 0.00, '史詩': 0.00, '傳說': 0.00, '神話': 0.00, '不朽': 0, '超越': 0, '鎏金': 0.25, '永恆': 0.4 , '至尊': 0.2, '無上': 0.15  } },
+  37: { cost: 50000000000, rates: { '普通': 0.00, '優秀': 0.00, '精良': 0.00, '史詩': 0.00, '傳說': 0.00, '神話': 0.00, '不朽': 0, '超越': 0, '鎏金': 0.2, '永恆': 0.3 , '至尊': 0.25 , '無上': 0.25  } },
+  38: { cost: 60000000000, rates: { '普通': 0.00, '優秀': 0.00, '精良': 0.00, '史詩': 0.00, '傳說': 0.00, '神話': 0.00, '不朽': 0, '超越': 0, '鎏金': 0.15, '永恆': 0.52 , '至尊': 0.08, '無上': 0.25 } },
+  39: { cost: 75000000000, rates: { '普通': 0.00, '優秀': 0.00, '精良': 0.00, '史詩': 0.00, '傳說': 0.00, '神話': 0.00, '不朽': 0., '超越': 0, '鎏金': 0., '永恆': 0.45 , '至尊': 0.25, '無上': 0.3  } },
+  40: { cost: 100000000000, rates: { '普通': 0.00, '優秀': 0.00, '精良': 0.00, '史詩': 0.00, '傳說': 0.00, '神話': 0.00, '不朽': 0, '超越': 0, '鎏金': 0, '永恆': 0 , '至尊': 0.1, '無上': 0.9  } },
 };
 
 const RARITY_SETTINGS = {
@@ -170,12 +175,12 @@ export default function Game() {
     // 🧙‍♂️ 第三步：根據設定的 catCount 數量，動態生成你的「50名精準斷代 ＋ 5000基礎長尾」規律衰減貓咪清單！
     const catsList = Array.from({ length: catCount }, (_, i) => {
       const catNum = i + 1;
-      
+      //貓咪算法
       // 🎯 玥楓完美調校核心：50名後分子精準歸零，加權幅度以 0.95 次方平滑壓制！
-      let Numofcat = (520 - catNum * 12);
+      let Numofcat = (520 - catNum * catNum * 12);
       if (Numofcat <= 0) { Numofcat = 1; }
       
-      const weightFactor = Numofcat * 0.0006 / Math.pow(catNum, 0.95); // 這裡採用降維平準後的 0.0006 確保貓咪不插隊
+      const weightFactor = Numofcat * 0.00003125 / Math.pow(catNum, 0.95); // 這裡採用降維平準後的 0.0006 確保貓咪不插隊
       const basePower = Math.max(10, 5000 - catNum * 48) * (1 + chestLevel * 0.05);
       
       const weightedPower = Math.max(0, Math.floor(realTopOnePower * weightFactor));
@@ -478,10 +483,10 @@ export default function Game() {
           let rewardChests = 50; 
           let rewardGold = 1000;
 
-          if (realLatestRank === 1) { rewardChests = 100000; rewardGold = 50000000; } 
-          else if (realLatestRank === 2) { rewardChests = 50000; rewardGold = 2000000; } 
-          else if (realLatestRank === 3) { rewardChests = 3000; rewardGold = 100000; } 
-          else if (realLatestRank <= 10) { rewardChests = 1500; rewardGold = 30000; } 
+          if (realLatestRank === 1) { rewardChests = 1000000; rewardGold = 50000000; } 
+          else if (realLatestRank === 2) { rewardChests = 500000; rewardGold = 2000000; } 
+          else if (realLatestRank === 3) { rewardChests = 30000; rewardGold = 100000; } 
+          else if (realLatestRank <= 10) { rewardChests = 15000; rewardGold = 30000; } 
 
           setChestCount(c => c + rewardChests);
           setGold(g => g + rewardGold);
@@ -634,7 +639,7 @@ export default function Game() {
     for (const [r, rate] of Object.entries(rates)) { cum += rate; if (rand <= cum) { rarity = r; break; } }
     const rs = SLOTS[Math.floor(Math.random() * SLOTS.length)];
     const bn = NAMES_BY_SLOT[rs][Math.floor(Math.random() * NAMES_BY_SLOT[rs].length)];
-    const mults = {'普通': 1, '優秀': 2.5, '精良': 6, '史詩': 15, '傳說': 40, '神話': 110, '不朽': 240, '超越': 500, '鎏金': 1200, '永恆': 36000 , '至尊': 128000 };
+    const mults = {'普通': 1, '優秀': 2.5, '精良': 6, '史詩': 15, '傳說': 40, '神話': 110, '不朽': 240, '超越': 500, '鎏金': 1200, '永恆': 36000 , '至尊': 128000 , '至尊': 10240000 };
     const m = mults[rarity] * (1 + chestLevel * 0.25);
     setNewDrop({ name: `[${rarity}] ${bn}`, slot: rs, rarity, attack: Math.floor((Math.random() * 10 + 5) * m), defense: Math.floor((Math.random() * 5 + 2) * m), health: Math.floor((Math.random() * 40 + 20) * m), sellValue: Math.floor(15 * m) });
   };
@@ -651,7 +656,7 @@ export default function Game() {
       const amountToOpen = Math.min(count, currentMulti);
       
       const safeLv = (lv && CHEST_LEVEL_CONFIGS[lv]) ? lv : 1;
-      const ro = ['普通', '優秀', '精良', '史詩', '傳說', '神話', '不朽', '超越', '鎏金', '永恆', '至尊'];
+      const ro = ['普通', '優秀', '精良', '史詩', '傳說', '神話', '不朽', '超越', '鎏金', '永恆', '至尊', '無上'];
       const filterIndex = ro.indexOf(flt);
 
       let totalEarnedGold = 0;
@@ -666,7 +671,7 @@ export default function Game() {
         
         const rs = SLOTS[Math.floor(Math.random() * SLOTS.length)];
         const bn = NAMES_BY_SLOT[rs][Math.floor(Math.random() * NAMES_BY_SLOT[rs].length)];
-        const mults = { '普通': 1, '優秀': 2.5, '精良': 6, '史詩': 15, '傳說': 40, '神話': 110, '不朽': 240, '超越': 500, '鎏金': 1200, '永恆': 36000 , '至尊': 128000 };
+        const mults = { '普通': 1, '優秀': 2.5, '精良': 6, '史詩': 15, '傳說': 40, '神話': 110, '不朽': 240, '超越': 500, '鎏金': 1200, '永恆': 36000 , '至尊': 128000 , '無上': 10240000 };
         const m = mults[rarity] * (1 + safeLv * 0.25);
         const item = { name: `[${rarity}] ${bn}`, slot: rs, rarity, attack: Math.floor((Math.random() * 10 + 5) * m), defense: Math.floor((Math.random() * 5 + 2) * m), health: Math.floor((Math.random() * 40 + 20) * m), sellValue: Math.floor(15 * m) };
 
@@ -1010,7 +1015,7 @@ export default function Game() {
               opacity: (chestLevel >= 30 || gold < CHEST_LEVEL_CONFIGS[chestLevel]?.cost) ? 0.4 : 1 
             }}
           >
-            {chestLevel < 30 ? `升級神壇寶箱 🪙 消耗 ${CHEST_LEVEL_CONFIGS[chestLevel]?.cost?.toLocaleString()}` : '🔮 寶箱神壇已達永恆至尊最大等級 (Lv.30)'}
+            {chestLevel < 40 ? `升級神壇寶箱 🪙 消耗 ${CHEST_LEVEL_CONFIGS[chestLevel]?.cost?.toLocaleString()}` : '🔮 寶箱神壇已達當前最大等級 (Lv.40)'}
           </button>
 
         </div>
@@ -1028,17 +1033,18 @@ export default function Game() {
                 </button>
                 <select value={autoFilter} onChange={(e) => setAutoFilter(e.target.value)} style={{ backgroundColor: '#0f172a', color: '#cbd5e1', border: '1px solid #1e293b', borderRadius: '6px', fontSize: '11px', padding: '4px', outline: 'none' }}>
                   <option value="無">不自動分解</option>
-                  <option value="普通">自動分解普通以下</option>
-                  <option value="優秀">自動分解優秀以下</option>
-                  <option value="精良">自動分解精良以下</option>
-                  <option value="史詩">自動分解史詩以下</option>
-                  <option value="傳說">自動分解傳說以下</option>
-                  <option value="神話">自動分解神話以下</option>
-                  <option value="不朽">自動分解不朽以下</option>
-                  <option value="超越">自動分解超越以下</option>
-                  <option value="鎏金">自動分解鎏金以下</option>
-                  <option value="永恆">自動分解永恆以下</option>
-                  <option value="至尊">自動分解至尊以下</option>
+                  <option value="普通">自動分解普通及以下</option>
+                  <option value="優秀">自動分解優秀及以下</option>
+                  <option value="精良">自動分解精良及以下</option>
+                  <option value="史詩">自動分解史詩及以下</option>
+                  <option value="傳說">自動分解傳說及以下</option>
+                  <option value="神話">自動分解神話及以下</option>
+                  <option value="不朽">自動分解不朽及以下</option>
+                  <option value="超越">自動分解超越及以下</option>
+                  <option value="鎏金">自動分解鎏金及以下</option>
+                  <option value="永恆">自動分解永恆及以下</option>
+                  <option value="至尊">自動分解至尊及以下</option>
+                  <option value="無上">自動分解無上及以下</option>
                 </select>
                 </div>
               </div>
@@ -1054,6 +1060,8 @@ export default function Game() {
                   <option value={50} disabled={chestLevel < 20}>50 連抽 {chestLevel < 20 ? '🔒(Lv.20)' : '🔓'}</option>
                   <option value={100} disabled={chestLevel < 25}>100 連抽 {chestLevel < 25 ? '🔒(Lv.25)' : '🔓'}</option>
                   <option value={500} disabled={chestLevel < 30}>500 連抽 {chestLevel < 30 ? '🔒(Lv.30)' : '🔓'}</option>
+                  <option value={1000} disabled={chestLevel < 35}>500 連抽 {chestLevel < 35 ? '🔒(Lv.35)' : '🔓'}</option>
+                  <option value={5000} disabled={chestLevel < 40}>500 連抽 {chestLevel < 40 ? '🔒(Lv.40)' : '🔓'}</option>
                 </select>
               </div>
 
