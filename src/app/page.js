@@ -1075,7 +1075,6 @@ export default function Game() {
             forge_levels: forgeLevels,
             talent_levels: talentLevels, // 🌌 核心新增：自動將最新天賦等級實時同步進 Supabase 資料庫
 
-
           })
           .eq('id', user.id);
       } catch (e) {
@@ -1398,17 +1397,22 @@ export default function Game() {
     setForgeLevels(p => ({ ...p, [slot]: currentLv + 1 }));
   };
   
-    // 🌌 核心新增：天賦升級按鈕邏輯！5億金幣天價起步，每級固定提升總屬性 1%
+      // 🌌 核心修正：天賦升級按鈕邏輯！採用實心拆解，確保 100% 觸發 React 狀態變更與自動存檔！
   const upgradeTalent = (talentName) => {
     const currentLv = talentLevels[talentName] || 0;
-    // 🌌 玥楓硬核數值：第一級 5 億，之後每級以 (等級 * 等級 * 2億 + 5億) 的地獄級斜率瘋狂通膨！
-    const cost = 500000000 + currentLv * currentLv * 200000000;
+    const cost = 500000000 + currentLv * currentLv * 200000;
     
-    if (gold < cost) return alert(`🪙 金幣餘額不足！升級此天賦需要 ${cost.toLocaleString()} 金幣！`);
+    if (gold < cost) return alert(`🪙 金幣餘額不足！升級此天賦需要 ${cost >= 100000000 ? `${(cost/100000000).toFixed(1)}億` : cost.toLocaleString()} 金幣！`);
     
+    // 1. 先扣除金幣
     setGold(g => g - cost);
-    setTalentLevels(p => ({ ...p, [talentName]: currentLv + 1 }));
+    
+    // 2. 🧙‍♂️ 終極正名：建立一個全新實心物件，強行逼迫 React 和自動存檔引擎立刻開機上傳！
+    const nextLevels = { ...talentLevels };
+    nextLevels[talentName] = currentLv + 1;
+    setTalentLevels(nextLevels);
   };
+
 
 
 
