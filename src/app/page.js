@@ -1004,10 +1004,10 @@ export default function Game() {
             </div>
 
           </div>
-                    {/* 核心修正：解鎖手動升級寶箱按鈕至 30 等 */}
+                    {/* 核心修正：解鎖手動升級寶箱按鈕至 40 等 */}
           <button 
             onClick={upgradeChest} 
-            disabled={chestLevel >= 30 || gold < CHEST_LEVEL_CONFIGS[chestLevel]?.cost} 
+            disabled={chestLevel >= 40 || gold < CHEST_LEVEL_CONFIGS[chestLevel]?.cost} 
             style={{ 
               width: '100%', marginTop: '16px', backgroundColor: '#1e293b', color: '#e2e8f0', 
               border: '1px solid #334155', padding: '10px', borderRadius: '10px', 
