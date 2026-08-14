@@ -773,6 +773,9 @@ export default function Game() {
   const [equipped, setEquipped] = useState({ '武器': null, '頭盔': null, '胸甲': null, '鞋子': null });
     // 🔨 核心新增：儲存四個裝備欄位的獨立鍛造等級，預設皆為 1 級
   const [forgeLevels, setForgeLevels] = useState({ "武器": 0, "頭盔": 0, "胸甲": 0, "鞋子": 0 });
+    // 🌌 核心新增：儲存天賦等級狀態，預設皆為 0 級開荒，升級門檻 5 億金幣起步
+  const [talentLevels, setTalentLevels] = useState({ "攻擊天賦": 0, "防禦天賦": 0, "生命天賦": 0 });
+
   const [newDrop, setNewDrop] = useState(null);
   const [board, setBoard] = useState([[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]);
   const [score, setScore] = useState(0);
@@ -786,24 +789,40 @@ export default function Game() {
   const [leaderboard, setLeaderboard] = useState([]);
 
     // 🔨 核心修正：實時戰力計算引擎！將各裝備欄位套用獨立的鍛造百分比增幅公式！
+    // 🌌 核心修正：實時戰力與基礎屬性計算引擎！完美融合「欄位鍛造」與「大後期 5億天賦百分比」雙重疊加公式！
   const stats = (() => {
     let attack = 50, defense = 20, health = 500;
     const currentEquipped = equipped || { '武器': null, '頭盔': null, '胸甲': null, '鞋子': null };
-    const currentForge = forgeLevels || { '武器': 1, '頭盔': 1, '胸甲': 1, '鞋子': 1 };
+    const currentForge = forgeLevels || { '武器': 0, '頭盔': 0, '胸甲': 0, '鞋子': 0 };
+    const currentTalent = talentLevels || { "攻擊天賦": 0, "防禦天賦": 0, "生命天賦": 0 };
 
+    // 1. 先計算裝備白字 ＋ 欄位鍛造百分比增幅
     Object.entries(currentEquipped).forEach(([slot, item]) => { 
       if (item) { 
-        // 🧙‍♂️ 鍛造百分比公式：每 1 級提供 1% 屬性乘法暴增（1 級 = 1.001 倍，1000 級 = 2.000 倍）
-        const forgeMultiplier = 1 + (currentForge[slot]) * 0.001;
-        
+        const forgeMultiplier = 1 + (currentForge[slot] || 0) * 0.01;
         attack += Math.floor((item.attack || 0) * forgeMultiplier); 
         defense += Math.floor((item.defense || 0) * forgeMultiplier); 
         health += Math.floor((item.health || 0) * forgeMultiplier); 
       } 
     });
 
-    return { attack, defense, health, power: Math.floor(attack * 4 + defense * 2.5 + health * 0.4) };
+    // 2. 🌌 核心新增：天賦神殿大暴擊！每 1 級天賦提供「總屬性 1%」的終極乘法放大（0 級 = +0%）
+    const attackTalentMultiplier = 1 + (currentTalent["攻擊天賦"] || 0) * 0.01;
+    const defenseTalentMultiplier = 1 + (currentTalent["防禦天賦"] || 0) * 0.01;
+    const healthTalentMultiplier = 1 + (currentTalent["生命天賦"] || 0) * 0.01;
+
+    const finalAttack = Math.floor(attack * attackTalentMultiplier);
+    const finalDefense = Math.floor(defense * defenseTalentMultiplier);
+    const finalHealth = Math.floor(health * healthTalentMultiplier);
+
+    return { 
+      attack: finalAttack, 
+      defense: finalDefense, 
+      health: finalHealth, 
+      power: Math.floor(finalAttack * 4 + finalDefense * 2.5 + finalHealth * 0.4) 
+    };
   })();
+
 
     // 🌐 核心新增：排行榜搜尋、滑桿下拉與個人排名狀態
   const [searchQuery, setSearchQuery] = useState(''); // 儲存使用者輸入的搜尋字串
@@ -940,6 +959,12 @@ export default function Game() {
           } else {
             setForgeLevels({ "武器": 0, "頭盔": 0, "胸甲": 0, "鞋子": 0 });
           }
+          // 🌌 核心新增：讀取雲端天賦存檔（防錯保底 0 級開局）
+            if (profData.talent_levels) {
+              setTalentLevels(profData.talent_levels);
+          } else {
+              setTalentLevels({ "攻擊天賦": 0, "防禦天賦": 0, "生命天賦": 0 });
+          }
 
           }
           setUser(loginData.user);
@@ -1041,7 +1066,11 @@ export default function Game() {
             power: stats.power,//四項鍛造資訊
             equipped: equipped,
             board: board,
-            forge_levels: forgeLevels // 🔨 核心新增：自動將最新鍛造等級實時同步進 Supabase 資料庫
+            forge_levels: forgeLevels, // 🔨 核心新增：自動將最新鍛造等級實時同步進 Supabase 資料庫
+
+            forge_levels: forgeLevels,
+            talent_levels: talentLevels, // 🌌 核心新增：自動將最新天賦等級實時同步進 Supabase 資料庫
+
 
           })
           .eq('id', user.id);
@@ -1364,6 +1393,19 @@ export default function Game() {
     setGold(g => g - cost);
     setForgeLevels(p => ({ ...p, [slot]: currentLv + 1 }));
   };
+  
+    // 🌌 核心新增：天賦升級按鈕邏輯！5億金幣天價起步，每級固定提升總屬性 1%
+  const upgradeTalent = (talentName) => {
+    const currentLv = talentLevels[talentName] || 0;
+    // 🌌 玥楓硬核數值：第一級 5 億，之後每級以 (等級 * 等級 * 2億 + 5億) 的地獄級斜率瘋狂通膨！
+    const cost = 500000000 + currentLv * currentLv * 200000000;
+    
+    if (gold < cost) return alert(`🪙 金幣餘額不足！升級此天賦需要 ${cost.toLocaleString()} 金幣！`);
+    
+    setGold(g => g - cost);
+    setTalentLevels(p => ({ ...p, [talentName]: currentLv + 1 }));
+  };
+
 
 
   // 🧙‍♂️ 核心修正：換上裝備！將新裝穿上，並強行把脫下來的「舊裝備」完美吐回掉落欄，絕不憑空消失！
@@ -1570,7 +1612,7 @@ export default function Game() {
             <h2 style={{ margin: '0 0 12px 0', fontSize: '15px', color: '#38bdf8', fontWeight: 'bold' }}>👤 已穿戴裝備位</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
               {<>
-                            <h2 style={{ margin: '0 0 12px 0', fontSize: '15px', color: '#38bdf8', fontWeight: 'bold' }}>👤 已穿戴神裝位 & 🔨 欄位鍛造增幅</h2>
+                            <h2 style={{ margin: '0 0 12px 0', fontSize: '15px', color: '#38bdf8', fontWeight: 'bold' }}>🔨 欄位鍛造增幅</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
               {SLOTS.map((slot) => {
                 const item = equipped[slot]; 
