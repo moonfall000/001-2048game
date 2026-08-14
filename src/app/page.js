@@ -1086,7 +1086,7 @@ export default function Game() {
     }, 1000); // 玩家停止動作 1 秒後，全自動無感背景上傳
 
     return () => clearTimeout(timer);
-  }, [gold, chestCount, chestLevel, equipped, board, score, isLoaded, user, stats.power, isCloudDataLoaded]);
+  }, [gold, chestCount, chestLevel, equipped, board, score, isLoaded, user, stats.power, isCloudDataLoaded, talentLevels]);
 
   // 原排行榜模擬 已更新為真人
     // 🌐 核心修正：徹底幹掉隨機假名單，直接從雲端資料庫抓取全服真實前 5 強排行榜！
