@@ -1012,7 +1012,7 @@ export default function Game() {
               width: '100%', marginTop: '16px', backgroundColor: '#1e293b', color: '#e2e8f0', 
               border: '1px solid #334155', padding: '10px', borderRadius: '10px', 
               cursor: 'pointer', fontSize: '12px', fontWeight: 'bold',
-              opacity: (chestLevel >= 30 || gold < CHEST_LEVEL_CONFIGS[chestLevel]?.cost) ? 0.4 : 1 
+              opacity: (chestLevel >= 40 || gold < CHEST_LEVEL_CONFIGS[chestLevel]?.cost) ? 0.4 : 1 
             }}
           >
             {chestLevel < 40 ? `升級神壇寶箱 🪙 消耗 ${CHEST_LEVEL_CONFIGS[chestLevel]?.cost?.toLocaleString()}` : '🔮 寶箱神壇已達當前最大等級 (Lv.40)'}
