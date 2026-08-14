@@ -745,9 +745,9 @@ const RARITY_SETTINGS = {
   '神話': { color: '#d61cef', bg: '#5b7f1d' },
   '不朽': { color: '#ff1b07', bg: '#1d7f56' },
   '超越': { color: '#25f192', bg: '#7f1d1d' },
-  '鎏金': { color: '#ffff00', bg: '#33da68' },
-  '永恆': { color: '#acf0f7', bg: '#e0b652' },
-  '至尊': { color: '#67eef5', bg: '#00ffcc' },
+  '鎏金': { color: '#ffff00', bg: '#090e55' },
+  '永恆': { color: '#acf0f7', bg: '#e99a1b' },
+  '至尊': { color: '#1e176a', bg: '#00ffcc' },
 };
 
 const SLOTS = ['武器', '頭盔', '胸甲', '鞋子'];
@@ -788,15 +788,16 @@ export default function Game() {
   const [timeToReset, setTimeToReset] = useState(60); 
   const [leaderboard, setLeaderboard] = useState([]);
 
-    // 🔨 核心修正：實時戰力計算引擎！將各裝備欄位套用獨立的鍛造百分比增幅公式！
-    // 🌌 核心修正：實時戰力與基礎屬性計算引擎！完美融合「欄位鍛造」與「大後期 5億天賦百分比」雙重疊加公式！
+    //核心：實時戰力計算引擎
+      // 🌌 核心修正：實時戰力計算引擎！完美把大後期天賦的百分比增幅乘進去！
   const stats = (() => {
     let attack = 50, defense = 20, health = 500;
     const currentEquipped = equipped || { '武器': null, '頭盔': null, '胸甲': null, '鞋子': null };
     const currentForge = forgeLevels || { '武器': 0, '頭盔': 0, '胸甲': 0, '鞋子': 0 };
+    // 讀取你的天賦狀態（防錯保底 0 級）
     const currentTalent = talentLevels || { "攻擊天賦": 0, "防禦天賦": 0, "生命天賦": 0 };
 
-    // 1. 先計算裝備白字 ＋ 欄位鍛造百分比增幅
+    // 1. 先算裝備 + 鍛造
     Object.entries(currentEquipped).forEach(([slot, item]) => { 
       if (item) { 
         const forgeMultiplier = 1 + (currentForge[slot] || 0) * 0.01;
@@ -806,7 +807,7 @@ export default function Game() {
       } 
     });
 
-    // 2. 🌌 核心新增：天賦神殿大暴擊！每 1 級天賦提供「總屬性 1%」的終極乘法放大（0 級 = +0%）
+    // 2. 🌌 核心新增：天賦乘法放大！1 級天賦 = +1% 總屬性（0 級 = +0% 不加不減）
     const attackTalentMultiplier = 1 + (currentTalent["攻擊天賦"] || 0) * 0.01;
     const defenseTalentMultiplier = 1 + (currentTalent["防禦天賦"] || 0) * 0.01;
     const healthTalentMultiplier = 1 + (currentTalent["生命天賦"] || 0) * 0.01;
@@ -822,6 +823,7 @@ export default function Game() {
       power: Math.floor(finalAttack * 4 + finalDefense * 2.5 + finalHealth * 0.4) 
     };
   })();
+
 
 
     // 🌐 核心新增：排行榜搜尋、滑桿下拉與個人排名狀態
@@ -1647,6 +1649,27 @@ export default function Game() {
               <div style={{ backgroundColor: '#020617', padding: '8px', borderRadius: '8px', border: '1px solid #1e293b' }}><div style={{ color: '#64748b' }}>攻擊</div><div style={{ fontWeight: 'bold', color: '#fff' }}>{stats.attack}</div></div>
               <div style={{ backgroundColor: '#020617', padding: '8px', borderRadius: '8px', border: '1px solid #1e293b' }}><div style={{ color: '#64748b' }}>防禦</div><div style={{ fontWeight: 'bold', color: '#fff' }}>{stats.defense}</div></div>
               <div style={{ backgroundColor: '#020617', padding: '8px', borderRadius: '8px', border: '1px solid #1e293b' }}><div style={{ color: '#64748b' }}>生命</div><div style={{ fontWeight: 'bold', color: '#fff' }}>{stats.health}</div></div>
+                
+                {/* 🌌 核心新增：天賦神殿面板！精準擺放在基礎屬性的正下方 */}
+            <h2 style={{ margin: '16px 0 12px 0', fontSize: '15px', color: '#a855f7', fontWeight: 'bold' }}>🌌 天賦神殿 (5億金幣起步 / 總屬性 +1%)</h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
+              {["攻擊天賦", "防禦天賦", "生命天賦"].map((talentName) => {
+                const currentLv = talentLevels[talentName] || 0;
+                // 升級條件：5億金幣起步
+                const cost = 500000000 + currentLv * currentLv * 200000000;
+                return (
+                  <div key={talentName} style={{ display: 'flex', flexDirection: 'column', gap: '4px', backgroundColor: '#090514', border: '1px solid #581c87', padding: '10px', borderRadius: '10px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontSize: '12px', color: '#c084fc', fontWeight: 'bold' }}>{talentName} <span style={{ color: '#a855f7' }}>(Lv.{currentLv} / +{currentLv}%)</span></span>
+                    </div>
+                    <button onClick={() => upgradeTalent(talentName)} style={{ width: '100%', marginTop: '4px', padding: '4px 8px', backgroundColor: gold >= cost ? '#3b0764' : '#05020a', color: gold >= cost ? '#d8b4fe' : '#4a207a', border: `1px solid ${gold >= cost ? '#a855f7' : '#3b0764'}`, borderRadius: '6px', cursor: gold >= cost ? 'pointer' : 'not-allowed', fontSize: '11px', fontWeight: 'bold', transition: '0.2s' }}>
+                      ⚡ {currentLv === 0 ? '覺醒解鎖' : '天賦升級'} (🪙{cost >= 100000000 ? `${(cost/100000000).toFixed(1)}億` : cost.toLocaleString()})
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+
             </div>
           </div>
                     {/* 核心修正：解鎖手動升級寶箱按鈕至 30 等 */}
