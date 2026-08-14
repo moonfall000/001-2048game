@@ -1047,7 +1047,9 @@ export default function Game() {
       // 🌐 核心修正：雙重鋼鐵防禦！如果玩家是剛註冊新角（此時 stats.power 應為初始），或者「剛登入但雲端舊檔還沒安全下載完畢」，一律死死攔截上傳，拒絕洗掉紀錄！
   useEffect(() => {
         // 🌌 修正：如果玩家剛登入、且雲端的真實天賦紀錄還沒 100% 安全下載到 React 之前，一律死死攔截上傳，拒絕扣錢洗存檔！
-    if (!isLoaded || !user || !isCloudDataLoaded || !talentLevels || typeof talentLevels !== 'object') return;
+        // 💡 關鍵修正：只要最核心的 user 登入成功、且下載鎖解開，就無條件放行上傳！不要在後面塞一堆會卡死天賦的物件判定！
+    if (!isLoaded || !user || !isCloudDataLoaded) return;
+
 
 
     // 建立一個防抖/延時上傳，避免玩家玩 2048 按太快導致頻繁呼叫雲端資料庫卡死
@@ -1396,17 +1398,16 @@ export default function Game() {
     setForgeLevels(p => ({ ...p, [slot]: currentLv + 1 }));
   };
   
-      // 🌌 核心修正：天賦升級按鈕邏輯！採用實心拆解，確保 100% 觸發 React 狀態變更與自動存檔！
-  const upgradeTalent = (talentName) => {
+  // 🌌 核心修正：天賦升級按鈕邏輯！採用實心拆解，確保 100% 觸發 React 狀態變更與自動存檔！
+    const upgradeTalent = (talentName) => {
     const currentLv = talentLevels[talentName] || 0;
-    const cost = 500000000 + currentLv * currentLv * 200000;
+    const cost = 500000000 + currentLv * currentLv * 200000000;
     
     if (gold < cost) return alert(`🪙 金幣餘額不足！升級此天賦需要 ${cost >= 100000000 ? `${(cost/100000000).toFixed(1)}億` : cost.toLocaleString()} 金幣！`);
     
-    // 1. 先扣除金幣
     setGold(g => g - cost);
-    
-    // 2. 🧙‍♂️ 終極正名：建立一個全新實心物件，強行逼迫 React 和自動存檔引擎立刻開機上傳！
+
+    // 💡 關鍵修正：必須透過建立全新物件 nextLevels，React 才能敏銳捕捉到物件內部的變更，進而觸發自動存檔！
     const nextLevels = { ...talentLevels };
     nextLevels[talentName] = currentLv + 1;
     setTalentLevels(nextLevels);
