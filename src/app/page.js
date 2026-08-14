@@ -907,21 +907,7 @@ export default function Game() {
             </div>
 
             {/* 📜 帶有垂直滾動滑桿（Overflow-Y）的真實前10名/全服名冊顯示區 */}
-            //排行榜高度
-            {/* 🟢 排行榜核心容器：將原本寫死的固定高度移除，改用 minHeight 或 flex: 1 讓它物理性全自動往下延伸，完美吃掉所有黑色空位！ */}
-            <div style={{ 
-              marginTop: '12px', 
-              backgroundColor: '#020617', 
-              border: '1px solid #1e293b', 
-              padding: '16px', 
-              borderRadius: '16px',
-              display: 'flex',
-              flexDirection: 'column',
-              // 🧙‍♂️ 視覺大修正：在這裡強行把最低高度拉長，或者讓它自動填滿父層！
-              maxHeight: '320px', 
-              justifyContent: 'space-between'
-            }}>
-
+            <div style={{ maxHeight: '320px', overflowY: 'auto', paddingRight: '4px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
               {filteredLeaderboard.length > 0 ? (
                 filteredLeaderboard?.map((p, idx) => {
                   // 在完整名冊中尋找原始真實排名
