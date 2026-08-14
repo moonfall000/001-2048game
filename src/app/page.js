@@ -867,7 +867,7 @@ export default function Game() {
       const catNum = i + 1;
       
       // 🎯 玥楓完美調校核心：50名後分子精準歸零，加權幅度以 0.95 次方平滑壓制！
-      let Numofcat = (600 - catNum * 12);
+      let Numofcat = (520 - catNum * 12);
       if (Numofcat <= 0) { Numofcat = 1; }
       
       const weightFactor = Numofcat * 0.0006 / Math.pow(catNum, 0.95); // 這裡採用降維平準後的 0.0006 確保貓咪不插隊
@@ -1079,6 +1079,9 @@ export default function Game() {
 
             forge_levels: forgeLevels,
             talent_levels: talentLevels, // 🌌 核心新增：自動將最新天賦等級實時同步進 Supabase 資料庫
+             "攻擊天賦": talentLevels["攻擊天賦"] !== undefined ? talentLevels["攻擊天賦"] : 0,
+              "防禦天賦": talentLevels["防禦天賦"] !== undefined ? talentLevels["防禦天賦"] : 0,
+              "生命天賦": talentLevels["生命天賦"] !== undefined ? talentLevels["生命天賦"] : 0
 
           })
           // 🧙‍♂️ 終極正名：使用雙重核對！不論是 user.id，還是你用來登入的 user_metadata.username，只要有一個對上，雲端 100% 鋼鐵寫入成功！
