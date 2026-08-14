@@ -771,6 +771,8 @@ export default function Game() {
   const [chestCount, setChestCount] = useState(100);
   const [chestLevel, setChestLevel] = useState(1);
   const [equipped, setEquipped] = useState({ '武器': null, '頭盔': null, '胸甲': null, '鞋子': null });
+    // 🔨 核心新增：儲存四個裝備欄位的獨立鍛造等級，預設皆為 1 級
+  const [forgeLevels, setForgeLevels] = useState({ "武器": 1, "頭盔": 1, "胸甲": 1, "鞋子": 1 });
   const [newDrop, setNewDrop] = useState(null);
   const [board, setBoard] = useState([[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]);
   const [score, setScore] = useState(0);
@@ -782,14 +784,27 @@ export default function Game() {
 
   const [timeToReset, setTimeToReset] = useState(60); 
   const [leaderboard, setLeaderboard] = useState([]);
-    // 實時戰力計算
+
+    // 🔨 核心修正：實時戰力計算引擎！將各裝備欄位套用獨立的鍛造百分比增幅公式！
   const stats = (() => {
     let attack = 50, defense = 20, health = 500;
-    Object.values(equipped).forEach((item) => {
-      if (item) { attack += item.attack; defense += item.defense; health += item.health; }
+    const currentEquipped = equipped || { '武器': null, '頭盔': null, '胸甲': null, '鞋子': null };
+    const currentForge = forgeLevels || { '武器': 1, '頭盔': 1, '胸甲': 1, '鞋子': 1 };
+
+    Object.entries(currentEquipped).forEach(([slot, item]) => { 
+      if (item) { 
+        // 🧙‍♂️ 鍛造百分比公式：每 1 級提供 1% 屬性乘法暴增（1 級 = 1.01 倍，100 級 = 2.00 倍）
+        const forgeMultiplier = 1 + (currentForge[slot] - 1) * 0.01;
+        
+        attack += Math.floor((item.attack || 0) * forgeMultiplier); 
+        defense += Math.floor((item.defense || 0) * forgeMultiplier); 
+        health += Math.floor((item.health || 0) * forgeMultiplier); 
+      } 
     });
+
     return { attack, defense, health, power: Math.floor(attack * 4 + defense * 2.5 + health * 0.4) };
   })();
+
     // 🌐 核心新增：排行榜搜尋、滑桿下拉與個人排名狀態
   const [searchQuery, setSearchQuery] = useState(''); // 儲存使用者輸入的搜尋字串
   const [myRank, setMyRank] = useState('--'); // 儲存玩家在全服的真實名次
@@ -917,6 +932,8 @@ export default function Game() {
             if (profData.equipped) setEquipped(profData.equipped);
           // 🧙‍♂️ 核正：確認雲端舊檔已經百分之百完美寫入 React 狀態，此時才可以安全開啟上傳
           setIsCloudDataLoaded(true);
+          // 🔨 核心新增：讀取雲端鍛造存檔（防錯保底）
+            if (profData.forge_levels) setForgeLevels(profData.forge_levels);
           }
           setUser(loginData.user);
           alert("🔑 歡迎回來，小貓咪！雲端存檔已同步載入。");
@@ -1012,7 +1029,13 @@ export default function Game() {
             score: score,
             power: stats.power, // 同步最新真實總戰力
             equipped: equipped,
-            board: board
+            board: board,
+
+            power: stats.power,//四項鍛造資訊
+            equipped: equipped,
+            board: board,
+            forge_levels: forgeLevels // 🔨 核心新增：自動將最新鍛造等級實時同步進 Supabase 資料庫
+
           })
           .eq('id', user.id);
       } catch (e) {
@@ -1323,6 +1346,19 @@ export default function Game() {
     setGold(p => p - cost); setChestLevel(nl);
   };
 
+    // 🔨 核心新增：鍛造升級按鈕邏輯！消耗金幣，提升指定部位的百分比增幅
+  const upgradeForge = (slot) => {
+    const currentLv = forgeLevels[slot] || 1;
+    // 數值平衡公式：升級消耗金幣 = 當前等級 * 當前等級 * 250
+    const cost = currentLv * currentLv * 100;
+    
+    if (gold < cost) return alert("🪙 金幣餘額不足，無法鍛造此部位！");
+    
+    setGold(g => g - cost);
+    setForgeLevels(p => ({ ...p, [slot]: currentLv + 1 }));
+  };
+
+
   // 🧙‍♂️ 核心修正：換上裝備！將新裝穿上，並強行把脫下來的「舊裝備」完美吐回掉落欄，絕不憑空消失！
   const equipItem = () => {
     if (!newDrop) return;
@@ -1524,22 +1560,38 @@ export default function Game() {
         {/* 中間：配戴神裝 */}
         <div style={boxStyle}>
           <div>
-            <h2 style={{ margin: '0 0 12px 0', fontSize: '15px', color: '#38bdf8', fontWeight: 'bold' }}>👤 已穿戴神裝位</h2>
+            <h2 style={{ margin: '0 0 12px 0', fontSize: '15px', color: '#38bdf8', fontWeight: 'bold' }}>👤 已穿戴裝備位</h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
+              {<>
+                            <h2 style={{ margin: '0 0 12px 0', fontSize: '15px', color: '#38bdf8', fontWeight: 'bold' }}>👤 已穿戴神裝位 & 🔨 欄位鍛造增幅</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
               {SLOTS.map((slot) => {
-                const item = equipped[slot];
-                const cfg = item ? { color: '#fb923c', bg: '#7c2d12' } : { color: '#475569', bg: '#020617' };
+                const item = equipped[slot]; 
+                const forgeLv = forgeLevels[slot] || 1;
+                // 計算升級成本
+                const forgeCost = forgeLv * forgeLv * 250;
+                const cfg = item ? RARITY_SETTINGS[item.rarity] : { color: '#475569', bg: '#020617' };
+                
                 return (
-                  <div key={slot} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', backgroundColor: '#020617', border: '1px solid #1e293b', borderRadius: '10px' }}>
-                    <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 'bold' }}>{slot}</span>
-                    {item ? (
-                      <span style={{ color: cfg.color, backgroundColor: cfg.bg, fontSize: '12px', padding: '2px 8px', borderRadius: '6px', border: `1px solid ${cfg.color}`, fontWeight: 'bold' }}>{item.name}</span>
-                    ) : (
-                      <span style={{ fontSize: '12px', color: '#334155' }}>⚡ 虛位以待</span>
-                    )}
+                  <div key={slot} style={{ display: 'flex', flexDirection: 'column', gap: '6px', backgroundColor: '#020617', border: '1px solid #1e293b', padding: '12px', borderRadius: '12px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 'bold' }}>{slot} <span style={{ color: '#38bdf8' }}>(Lv.{forgeLv} / +{(forgeLv-1)}%)</span></span>
+                      {item ? ( 
+                        <span style={{ color: cfg.color, backgroundColor: cfg.bg, fontSize: '11px', padding: '2px 6px', borderRadius: '6px', border: `1px solid ${cfg.color}`, fontWeight: 'bold' }}>{item.name}</span> 
+                      ) : ( 
+                        <span style={{ fontSize: '11px', color: '#334155' }}>⚡ 虛位以待</span> 
+                      )}
+                    </div>
+                    {/* 一鍵升級鍛造欄位按鈕 */}
+                    <button onClick={() => upgradeForge(slot)} style={{ width: '100%', marginTop: '4px', padding: '4px 8px', backgroundColor: gold >= forgeCost ? '#1e293b' : '#090d16', color: gold >= forgeCost ? '#38bdf8' : '#475569', border: `1px solid ${gold >= forgeCost ? '#38bdf8' : '#1e293b'}`, borderRadius: '6px', cursor: gold >= forgeCost ? 'pointer' : 'not-allowed', fontSize: '11px', fontWeight: 'bold', textAlign: 'center', transition: '0.2s' }}>
+                      ⚡ 消耗 🪙{forgeCost.toLocaleString()} ➔ 鍛造升級 +1%
+                    </button>
                   </div>
                 );
               })}
+            </div>
+</>
+              }
             </div>
             <h2 style={{ margin: '0 0 8px 0', fontSize: '15px', color: '#38bdf8', fontWeight: 'bold' }}>📊 基礎屬性增幅</h2>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', textAlign: 'center', fontSize: '12px' }}>
