@@ -772,7 +772,7 @@ export default function Game() {
   const [chestLevel, setChestLevel] = useState(1);
   const [equipped, setEquipped] = useState({ '武器': null, '頭盔': null, '胸甲': null, '鞋子': null });
     // 🔨 核心新增：儲存四個裝備欄位的獨立鍛造等級，預設皆為 1 級
-  const [forgeLevels, setForgeLevels] = useState({ "武器": 1, "頭盔": 1, "胸甲": 1, "鞋子": 1 });
+  const [forgeLevels, setForgeLevels] = useState({ "武器": 0, "頭盔": 0, "胸甲": 0, "鞋子": 0 });
   const [newDrop, setNewDrop] = useState(null);
   const [board, setBoard] = useState([[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]);
   const [score, setScore] = useState(0);
@@ -934,6 +934,13 @@ export default function Game() {
           setIsCloudDataLoaded(true);
           // 🔨 核心新增：讀取雲端鍛造存檔（防錯保底）
             if (profData.forge_levels) setForgeLevels(profData.forge_levels);
+          // 🔨 核心修正：讀取雲端鍛造存檔，如果雲端剛好是空的，老老實實給它保底 1 級，絕對不讓變數吃空！
+          if (profData.forge_levels) {
+            setForgeLevels(profData.forge_levels);
+          } else {
+            setForgeLevels({ "武器": 0, "頭盔": 0, "胸甲": 0, "鞋子": 0 });
+          }
+
           }
           setUser(loginData.user);
           alert("🔑 歡迎回來，小貓咪！雲端存檔已同步載入。");
