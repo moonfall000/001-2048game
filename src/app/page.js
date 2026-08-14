@@ -1644,33 +1644,40 @@ export default function Game() {
 </>
               }
             </div>
-            <h2 style={{ margin: '0 0 8px 0', fontSize: '15px', color: '#38bdf8', fontWeight: 'bold' }}>📊 基礎屬性增幅</h2>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', textAlign: 'center', fontSize: '12px' }}>
-              <div style={{ backgroundColor: '#020617', padding: '8px', borderRadius: '8px', border: '1px solid #1e293b' }}><div style={{ color: '#64748b' }}>攻擊</div><div style={{ fontWeight: 'bold', color: '#fff' }}>{stats.attack}</div></div>
-              <div style={{ backgroundColor: '#020617', padding: '8px', borderRadius: '8px', border: '1px solid #1e293b' }}><div style={{ color: '#64748b' }}>防禦</div><div style={{ fontWeight: 'bold', color: '#fff' }}>{stats.defense}</div></div>
-              <div style={{ backgroundColor: '#020617', padding: '8px', borderRadius: '8px', border: '1px solid #1e293b' }}><div style={{ color: '#64748b' }}>生命</div><div style={{ fontWeight: 'bold', color: '#fff' }}>{stats.health}</div></div>
-                
-                {/* 🌌 核心新增：天賦神殿面板！精準擺放在基礎屬性的正下方 */}
-            <h2 style={{ margin: '16px 0 12px 0', fontSize: '15px', color: '#a855f7', fontWeight: 'bold' }}>🌌 天賦神殿 (5億金幣起步 / 總屬性 +1%)</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
-              {["攻擊天賦", "防禦天賦", "生命天賦"].map((talentName) => {
-                const currentLv = talentLevels[talentName] || 0;
-                // 升級條件：5億金幣起步
-                const cost = 500000000 + currentLv * currentLv * 200000000;
-                return (
-                  <div key={talentName} style={{ display: 'flex', flexDirection: 'column', gap: '4px', backgroundColor: '#090514', border: '1px solid #581c87', padding: '10px', borderRadius: '10px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ fontSize: '12px', color: '#c084fc', fontWeight: 'bold' }}>{talentName} <span style={{ color: '#a855f7' }}>(Lv.{currentLv} / +{currentLv}%)</span></span>
-                    </div>
-                    <button onClick={() => upgradeTalent(talentName)} style={{ width: '100%', marginTop: '4px', padding: '4px 8px', backgroundColor: gold >= cost ? '#3b0764' : '#05020a', color: gold >= cost ? '#d8b4fe' : '#4a207a', border: `1px solid ${gold >= cost ? '#a855f7' : '#3b0764'}`, borderRadius: '6px', cursor: gold >= cost ? 'pointer' : 'not-allowed', fontSize: '11px', fontWeight: 'bold', transition: '0.2s' }}>
-                      ⚡ {currentLv === 0 ? '覺醒解鎖' : '天賦升級'} (🪙{cost >= 100000000 ? `${(cost/100000000).toFixed(1)}億` : cost.toLocaleString()})
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
+                        {/* 🧙‍♂️ 終極版面校正：外層用 flex 左右並排！把屬性與天賦拉開，畫面瞬間大器舒暢 */}
+            <div style={{ display: 'flex', gap: '16px', width: '100%', marginTop: '16px', marginBottom: '16px', flexWrap: 'wrap' }}>
+              
+              {/* 🟢 左半邊：基礎屬性增幅 (佔比 1) */}
+              <div style={{ flex: 1, minWidth: '240px' }}>
+                <h2 style={{ margin: '0 0 12px 0', fontSize: '15px', color: '#38bdf8', fontWeight: 'bold' }}>📊 基礎屬性增幅</h2>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', textAlign: 'center', fontSize: '12px' }}>
+                  <div style={{ backgroundColor: '#020617', padding: '12px 8px', borderRadius: '8px', border: '1px solid #1e293b' }}><div style={{ color: '#64748b', marginBottom: '4px' }}>攻擊</div><div style={{ fontWeight: 'bold', color: '#fff', fontSize: '13px', fontFamily: 'monospace' }}>{stats.attack.toLocaleString()}</div></div>
+                  <div style={{ backgroundColor: '#020617', padding: '12px 8px', borderRadius: '8px', border: '1px solid #1e293b' }}><div style={{ color: '#64748b', marginBottom: '4px' }}>防禦</div><div style={{ fontWeight: 'bold', color: '#fff', fontSize: '13px', fontFamily: 'monospace' }}>{stats.defense.toLocaleString()}</div></div>
+                  <div style={{ backgroundColor: '#020617', padding: '12px 8px', borderRadius: '8px', border: '1px solid #1e293b' }}><div style={{ color: '#64748b', marginBottom: '4px' }}>生命</div><div style={{ fontWeight: 'bold', color: '#fff', fontSize: '13px', fontFamily: 'monospace' }}>{stats.health.toLocaleString()}</div></div>
+                </div>
+              </div>
+
+              {/* 🟣 右半邊：🌌 天賦神殿 (佔比 1) */}
+              <div style={{ flex: 1, minWidth: '240px' }}>
+                <h2 style={{ margin: '0 0 12px 0', fontSize: '15px', color: '#a855f7', fontWeight: 'bold' }}>🌌 天賦神殿 (總屬性 +1%)</h2>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {["攻擊天賦", "防禦天賦", "生命天賦"].map((talentName) => {
+                    const currentLv = talentLevels[talentName] || 0;
+                    const cost = 500000000 + currentLv * currentLv * 200000000;
+                    return (
+                      <div key={talentName} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#090514', border: '1px solid #581c87', padding: '8px 12px', borderRadius: '10px' }}>
+                        <span style={{ fontSize: '12px', color: '#c084fc', fontWeight: 'bold' }}>{talentName} <span style={{ color: '#a855f7' }}>(Lv.{currentLv} / +{currentLv}%)</span></span>
+                        <button onClick={() => upgradeTalent(talentName)} style={{ padding: '6px 12px', backgroundColor: gold >= cost ? '#3b0764' : '#05020a', color: gold >= cost ? '#d8b4fe' : '#4a207a', border: `1px solid ${gold >= cost ? '#a855f7' : '#3b0764'}`, borderRadius: '6px', cursor: gold >= cost ? 'pointer' : 'not-allowed', fontSize: '11px', fontWeight: 'bold', transition: '0.2s', minWidth: '100px' }}>
+                          ⚡ {currentLv === 0 ? '覺醒' : '升級'} ({cost >= 100000000 ? `${(cost/100000000).toFixed(1)}億` : cost.toLocaleString()})
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
 
             </div>
+
           </div>
                     {/* 核心修正：解鎖手動升級寶箱按鈕至 30 等 */}
           <button 
