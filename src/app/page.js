@@ -793,8 +793,8 @@ export default function Game() {
 
     Object.entries(currentEquipped).forEach(([slot, item]) => { 
       if (item) { 
-        // 🧙‍♂️ 鍛造百分比公式：每 1 級提供 1% 屬性乘法暴增（1 級 = 1.01 倍，100 級 = 2.00 倍）
-        const forgeMultiplier = 1 + (currentForge[slot] - 1) * 0.01;
+        // 🧙‍♂️ 鍛造百分比公式：每 1 級提供 1% 屬性乘法暴增（1 級 = 1.001 倍，1000 級 = 2.000 倍）
+        const forgeMultiplier = 1 + (currentForge[slot]) * 0.001;
         
         attack += Math.floor((item.attack || 0) * forgeMultiplier); 
         defense += Math.floor((item.defense || 0) * forgeMultiplier); 
