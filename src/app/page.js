@@ -424,8 +424,6 @@ export default function Game() {
 
   // 原排行榜模擬 已更新為真人
     // 🌐 核心修正：徹底幹掉隨機假名單，直接從雲端資料庫抓取全服真實前 5 強排行榜！
-    // 🌐 核心修正：撈取全服所有玩家並計算個人排名，融合20隻貓咪保底名單
-    // 🌐 排行榜修正：撈取雲端所有玩家，若無真人或連線失敗，一律用貓咪1號~20號補滿
   useEffect(() => {
     if (!user) return;
     const fetchAllPlayersAndRank = async () => {
@@ -437,16 +435,6 @@ export default function Game() {
           mergedList = data.map(p => ({ name: p.username, power: p.power, isPlayer: p.id === user.id }));
         }
       } catch (e) { console.error("雲端連線失敗，由貓咪保底接管:", e); }
-
-      // 塞入 20 隻貓咪保底，並剔除重複重名的
-      let catCounter = 1;
-      while (catCounter <= 20) {
-        const catName = `🐱 貓咪${catCounter}號`;
-        if (!mergedList.some(p => p.name === catName)) {
-          mergedList.push({ name: catName, power: Math.max(10, 500 - catCounter * 20), isPlayer: false });
-        }
-        catCounter++;
-      }
 
       // 確保自己如果不在名單裡，全自動把自己補進去，防止顯示「查無此人」
       if (!mergedList.some(p => p.isPlayer)) {
