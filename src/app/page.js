@@ -841,42 +841,43 @@ export default function Game() {
   // 修正：將寫死的貓咪名單與你（玩家）的真實戰力即時大排序，並精準計算個人全服排名
   // 🟢 完美修正：真・全服第一名加權！精準抓取所有人中的最強戰力，作為貓咪動態膨脹的火車頭！
     // 🟢 完美修正：真・全服 100 隻貓咪集體咬合引擎！名次越後面，對第一名戰力的咬合幅度與敏感度全自動階梯式衰減！
+    // 🟢 完美修正：真・全服實時大排序！絕對不亂覆蓋別人的戰力，讓玥楓的 27 億與 YF 的 21 億在所有人手機上完美對齊同步！
   const displayLeaderboard = (() => {
-    // 🧙‍♂️ 第一步：過濾出名冊內所有的「純真人玩家」（包含那 3 位真人與你）
-    let pureRealPlayers = allPlayers.filter(p => p.isPlayer || !p.name.startsWith('🐱'));
+    // 🧙‍♂️ 第一步：精準找出目前雲端撈回來的「純真人玩家名冊」（含你和 YF 等所有真人）
+    let pureRealPlayers = allPlayers.map(p => {
+      // 💡 核心保險鎖：如果這個真人是「當前正在操作手機的玩家自己」，才用他本地最實時的戰力去同步
+      if (p.isPlayer) {
+        return {
+          ...p,
+          name: authInput.username || p.name,
+          power: stats.power // 只有自己才吃本地即時戰力
+        };
+      }
+      // 如果是別的真人玩家，老老實實保留雲端 profiles 資料庫吐回來的真實戰力（如玥楓的27億、YF的21億），絕對不亂覆蓋！
+      return p;
+    });
 
-    // 確保玩家自己的最新實時數據在裡面
-    const meIndex = pureRealPlayers.findIndex(p => p.isPlayer);
-    if (meIndex !== -1) {
-      pureRealPlayers[meIndex].power = stats.power;
-    } else {
-      pureRealPlayers.push({ name: authInput.username || '你（玩家）', power: stats.power, isPlayer: true });
-    }
-
-    // 🧙‍♂️ 第二步：精準挑出目前全伺服器所有真人玩家中的「實時最強天花板戰力」
+    // 🧙‍♂️ 第二步：找出目前純真人維度裡的最強天花板戰力（當作 100 隻貓咪的加權火車頭）
     const realTopOnePower = pureRealPlayers.length > 0 
       ? Math.max(...pureRealPlayers.map(p => p.power || 500)) 
       : 500;
 
-    // 🧙‍♂️ 第三步：根據 catCount (100隻) 數量，全自動動態生成規律衰減的假貓咪清單！
+    // 🧙‍♂️ 第三步：根據設定的 catCount 數量，動態生成你的「50名精準斷代 ＋ 5000基礎長尾」規律衰減貓咪清單！
     const catsList = Array.from({ length: catCount }, (_, i) => {
       const catNum = i + 1;
-      //貓咪算法
-      // 🎯 規律衰減核心：計算這隻貓咪的「咬合係數」
-      // 除以 catNum 的增長，讓加權幅度以規律的斜率瘋狂縮小！ 基本上50名後吃不到加權
-      let Numofcat = (620 - catNum * 4);
-      if (Numofcat <= 0) { Numofcat = 1};
-      const weightFactor = (Numofcat) * 0.0014 / Math.pow(catNum, 0.995); // 0.65次方控制衰減平滑度，名次越後越咬不動
       
-      // 🎮 基礎保底戰力也隨著排名由大到小規律遞減
-      const basePower = Math.max(10, 5000 - catNum * 22) * (1 + chestLevel * 0.05);
+      // 🎯 玥楓完美調校核心：50名後分子精準歸零，加權幅度以 0.95 次方平滑壓制！
+      let Numofcat = (600 - catNum * 12);
+      if (Numofcat <= 0) { Numofcat = 1; }
       
-      // ⚔️ 最終計算：真・第一名戰力 * 專屬衰減係數 + 保底基底
-      let finalCatPower = Math.floor(((realTopOnePower * weightFactor)/catNum)/catNum) + Math.floor(basePower);
+      const weightFactor = Numofcat * 0.0006 / Math.pow(catNum, 0.95); // 這裡採用降維平準後的 0.0006 確保貓咪不插隊
+      const basePower = Math.max(10, 5000 - catNum * 48) * (1 + chestLevel * 0.05);
+      
+      const weightedPower = Math.max(0, Math.floor(realTopOnePower * weightFactor));
+      let finalCatPower = weightedPower + Math.floor(basePower);
 
-      // 🎲 偽隨機跳動：一樣引入全域同步時間秒數 (timeToReset)，讓 100 隻貓咪有在線上呼吸的換裝跳動感
       const elapsedSeconds = 86400 - (timeToReset || 86400);
-      const liveVolatility = Math.floor(Math.sin(Math.floor(elapsedSeconds / 3) + catNum) * 125);
+      const liveVolatility = Math.floor(Math.sin(Math.floor(elapsedSeconds / 3) + catNum) * 15);
       finalCatPower += liveVolatility;
 
       return {
@@ -886,7 +887,7 @@ export default function Game() {
       };
     });
 
-    // 第四步：將所有真實玩家與規律咬合的 100 隻貓咪進行世紀大合體
+    // 第四步：將不亂吃變數的真人名冊，與加權好的貓咪群進行大合體
     let list = [...pureRealPlayers, ...catsList];
 
     // 第五步：全服混合大排序！
