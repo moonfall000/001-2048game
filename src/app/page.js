@@ -951,8 +951,6 @@ export default function Game() {
             setScore(profData.score);
             if (profData.board) setBoard(profData.board);
             if (profData.equipped) setEquipped(profData.equipped);
-          // 🧙‍♂️ 核正：確認雲端舊檔已經百分之百完美寫入 React 狀態，此時才可以安全開啟上傳
-          setIsCloudDataLoaded(true);
           // 🔨 核心新增：讀取雲端鍛造存檔（防錯保底）
             if (profData.forge_levels) setForgeLevels(profData.forge_levels);
           // 🔨 核心修正：讀取雲端鍛造存檔，如果雲端剛好是空的，老老實實給它保底 1 級，絕對不讓變數吃空！
@@ -967,7 +965,8 @@ export default function Game() {
           } else {
               setTalentLevels({ "攻擊天賦": 0, "防禦天賦": 0, "生命天賦": 0 });
           }
-
+          // 🧙‍♂️ 核正：確認雲端舊檔已經百分之百完美寫入 React 狀態，此時才可以安全開啟上傳
+          setIsCloudDataLoaded(true);
           }
           setUser(loginData.user);
           alert("🔑 歡迎回來，小貓咪！雲端存檔已同步載入。");
