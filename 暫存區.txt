@@ -7,21 +7,30 @@ npm run dev
 
 //在supabase SQL Editor
 
--- 🌌 究極導正：強行把所有可能因為 null 導致前端 React 崩潰的欄位，通通灌入合法的實心數字與文字！
--- 100% 斷根任何 client-side exception 型別解構異常，恭迎玥楓號瞬間復活登入！
-
 UPDATE public.profiles 
 SET 
     username = '玥楓',
-    gold = 99365301280292,          -- 如果是空，強行補回 3653 億金幣
-    chest_count = 9358510,  -- 如果是空，強行補回 35 萬寶箱庫存
-    chest_level = 30,      -- 如果是空，強行補回 30 級神壇
+    gold = coalesce(gold, 999999999999),          -- 如果是空，強行補回 9999.99999999 億金幣
+    chest_count = coalesce(chest_count, 999999),  -- 如果是空，強行補回 99.9999 萬寶箱庫存
+    chest_level = coalesce(chest_level, 40),      -- 如果是空，強行補回 30 級神壇
     
     -- 確保高階 JSON 欄位完全不是空，而是最安全合法的空物件與空矩陣
-    equipped = '{}'::jsonb,
-    forge_levels = '{"武器": 3600, "頭盔": 1200, "胸甲": 1200, "鞋子": 1200}'::jsonb,
-    talent_levels = '{"攻擊天賦": 3600, "防禦天賦": 0, "生命天賦": 10000}'::jsonb
+    forge_levels = '{"武器": 3600, "頭盔": 120, "胸甲": 120, "鞋子": 120}'::jsonb,
+    talent_levels = '{"攻擊天賦": 360, "防禦天賦": 0, "生命天賦": 1000}'::jsonb
 
-
--- 🔒 精準只對你自己的 Gmail UUID 進行最終防護，絕對不誤傷 YF 和茶茶！
 WHERE id = 'eb4501ef-4099-4b90-bbcd-3a1c2fefeab0'::uuid;
+
+--要留下來的
+
+UPDATE public.profiles 
+SET 
+    username = 'YF',
+    gold = coalesce(gold, 6531280292),          -- 如果是空，強行補回 金幣
+    chest_count = coalesce(chest_count, 935810),  -- 如果是空，強行補回 寶箱
+    chest_level = coalesce(chest_level, 35),      -- 如果是空，強行補回 神壇
+    
+    -- 確保高階 JSON 欄位完全不是空，而是最安全合法的空物件與空矩陣
+    forge_levels = '{"武器": 1600, "頭盔": 360, "胸甲": 360, "鞋子": 360}'::jsonb,
+    talent_levels = '{"攻擊天賦": 36, "防禦天賦": 0, "生命天賦": 100}'::jsonb
+
+WHERE id = 'b5949cf8-5e8a-4278-b06d-5211b853f0e2'::uuid;
