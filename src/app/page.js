@@ -1060,8 +1060,8 @@ export default function Game() {
                   <option value={50} disabled={chestLevel < 20}>50 連抽 {chestLevel < 20 ? '🔒(Lv.20)' : '🔓'}</option>
                   <option value={100} disabled={chestLevel < 25}>100 連抽 {chestLevel < 25 ? '🔒(Lv.25)' : '🔓'}</option>
                   <option value={500} disabled={chestLevel < 30}>500 連抽 {chestLevel < 30 ? '🔒(Lv.30)' : '🔓'}</option>
-                  <option value={1000} disabled={chestLevel < 35}>500 連抽 {chestLevel < 35 ? '🔒(Lv.35)' : '🔓'}</option>
-                  <option value={5000} disabled={chestLevel < 40}>500 連抽 {chestLevel < 40 ? '🔒(Lv.40)' : '🔓'}</option>
+                  <option value={1000} disabled={chestLevel < 35}>1000 連抽 {chestLevel < 35 ? '🔒(Lv.35)' : '🔓'}</option>
+                  <option value={5000} disabled={chestLevel < 40}>5000 連抽 {chestLevel < 40 ? '🔒(Lv.40)' : '🔓'}</option>
                 </select>
               </div>
 
