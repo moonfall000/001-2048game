@@ -971,13 +971,29 @@ export default function Game() {
                         {/* 🧙‍♂️ 終極版面校正：外層用 flex 左右並排！把屬性與天賦拉開，畫面瞬間大器舒暢 */}
             <div style={{ display: 'flex', gap: '16px', width: '100%', marginTop: '16px', marginBottom: '16px', flexWrap: 'wrap' }}>
               
-              {/* 🟢 左半邊：基礎屬性增幅 (佔比 1) */}
+                            {/* 🟢 基礎屬性增幅：優化為垂直一排、左名稱靠左、右數值靠右、字體等寬縮小 */}
               <div style={{ flex: 1, minWidth: '240px' }}>
                 <h2 style={{ margin: '0 0 12px 0', fontSize: '15px', color: '#38bdf8', fontWeight: 'bold' }}>📊 基礎屬性增幅</h2>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', textAlign: 'center', fontSize: '12px' }}>
-                  <div style={{ backgroundColor: '#020617', padding: '12px 8px', borderRadius: '8px', border: '1px solid #1e293b' }}><div style={{ color: '#64748b', marginBottom: '4px' }}>攻擊</div><div style={{ fontWeight: 'bold', color: '#fff', fontSize: '13px', fontFamily: 'monospace' }}>{stats.attack.toLocaleString()}</div></div>
-                  <div style={{ backgroundColor: '#020617', padding: '12px 8px', borderRadius: '8px', border: '1px solid #1e293b' }}><div style={{ color: '#64748b', marginBottom: '4px' }}>防禦</div><div style={{ fontWeight: 'bold', color: '#fff', fontSize: '13px', fontFamily: 'monospace' }}>{stats.defense.toLocaleString()}</div></div>
-                  <div style={{ backgroundColor: '#020617', padding: '12px 8px', borderRadius: '8px', border: '1px solid #1e293b' }}><div style={{ color: '#64748b', marginBottom: '4px' }}>生命</div><div style={{ fontWeight: 'bold', color: '#fff', fontSize: '13px', fontFamily: 'monospace' }}>{stats.health.toLocaleString()}</div></div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', backgroundColor: '#020617', border: '1px solid #1e293b', padding: '12px', borderRadius: '12px' }}>
+                  
+                  {/* ⚔️ 攻擊屬性列 */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '12px', borderBottom: '1px solid #0f172a', paddingBottom: '4px' }}>
+                    <span style={{ color: '#64748b', ...fontStyle, fontWeight: 'bold' }}>攻擊</span>
+                    <span style={{ fontWeight: 'bold', color: '#fff', fontFamily: 'monospace', fontSize: '12px' }}>{stats.attack.toLocaleString()}</span>
+                  </div>
+
+                  {/* 🛡️ 防禦屬性列 */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '12px', borderBottom: '1px solid #0f172a', paddingBottom: '4px', paddingTop: '2px' }}>
+                    <span style={{ color: '#64748b', ...fontStyle, fontWeight: 'bold' }}>防禦</span>
+                    <span style={{ fontWeight: 'bold', color: '#fff', fontFamily: 'monospace', fontSize: '12px' }}>{stats.defense.toLocaleString()}</span>
+                  </div>
+
+                  {/* ❤️ 生命屬性列 */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '12px', paddingTop: '2px' }}>
+                    <span style={{ color: '#64748b', ...fontStyle, fontWeight: 'bold' }}>生命</span>
+                    <span style={{ fontWeight: 'bold', color: '#fff', fontFamily: 'monospace', fontSize: '12px' }}>{stats.health.toLocaleString()}</span>
+                  </div>
+
                 </div>
               </div>
 
