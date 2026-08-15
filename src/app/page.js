@@ -153,7 +153,7 @@ export default function Game() {
     // 🌐 核心新增：排行榜搜尋、滑桿下拉與個人排名狀態
   const [searchQuery, setSearchQuery] = useState(''); // 儲存使用者輸入的搜尋字串
   const [myRank, setMyRank] = useState('--'); // 儲存玩家在全服的真實名次
-  const [catCount, setCatCount] = useState(100); // 🐱 核心新增：控制假貓咪數量的變數，預設為 20 隻
+  const [catCount, setCatCount] = useState(200); // 🐱 核心新增：控制假貓咪數量的變數，預設為 20 隻
 
   // 儲存雲端撈出的所有玩家+貓咪完整名冊
     // 核心修正：開局直接把 🐱 貓咪 1 號到 20 號寫死塞入 allPlayers 狀態，保證搜尋滑桿絕對不落空！
@@ -191,10 +191,10 @@ export default function Game() {
       const catNum = i + 1;
       //貓咪算法
       // 🎯 玥楓完美調校核心：50名後分子精準歸零，加權幅度以 0.95 次方平滑壓制！
-      let Numofcat = (520 - catNum * catNum * 12);
+      let Numofcat = (520 - catNum * catNum * catNum * 12);
       if (Numofcat <= 0) { Numofcat = 1; }
       
-      const weightFactor = Numofcat * 0.00003125 / Math.pow(catNum, 0.95); // 這裡採用降維平準後的 0.0006 確保貓咪不插隊
+      const weightFactor = Numofcat * 0.00003125 / Math.pow(catNum, 0.65); // 這裡採用降維平準後的 0.0006 確保貓咪不插隊
       const basePower = Math.max(10, 5000 - catNum * 48) * (1 + chestLevel * 0.05);
       
       const weightedPower = Math.max(0, Math.floor(realTopOnePower * weightFactor));
